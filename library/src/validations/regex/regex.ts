@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates a string with a regex.
@@ -15,7 +15,7 @@ export function regex<TInput extends string>(
 ) {
   const kind = 'regex' as const;
   const message = error ?? 'Invalid regex';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       !requirement.test(input)
         ? getPipeIssues(kind, message, input)

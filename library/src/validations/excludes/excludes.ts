@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 export function excludes<TInput extends string>(
   requirement: string,
@@ -26,7 +26,7 @@ export function excludes<
 >(requirement: TRequirement, error?: ErrorMessage) {
   const kind = 'excludes' as const;
   const message = error ?? 'Invalid content';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       input.includes(requirement as any)
         ? getPipeIssues(kind, message, input)

@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates the byte length of a string.
@@ -15,7 +15,7 @@ export function maxBytes<
 >(requirement: TRequirement, error?: ErrorMessage) {
   const kind = 'max_bytes' as const;
   const message = error ?? 'Invalid byte length';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       new TextEncoder().encode(input).length > requirement
         ? getPipeIssues(kind, message, input)

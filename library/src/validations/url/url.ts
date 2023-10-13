@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates a URL.
@@ -14,7 +14,7 @@ import { getOutput, getPipeIssues } from '../../utils/index.ts';
 export function url<TInput extends string>(error?: ErrorMessage) {
   const kind = 'url' as const;
   const message = error ?? 'Invalid URL';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> => {
       try {
         new URL(input);

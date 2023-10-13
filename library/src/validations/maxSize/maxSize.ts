@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates the size of a map, set or blob.
@@ -13,15 +13,15 @@ export function maxSize<
   TInput extends Map<any, any> | Set<any> | Blob,
   const TRequirement extends number
 >(requirement: TRequirement, error?: ErrorMessage) {
-  const type = 'max_size' as const;
+  const kind = 'max_size' as const;
   const message = error ?? 'Invalid size';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       input.size > requirement
-        ? getPipeIssues(type, message, input)
+        ? getPipeIssues(kind, message, input)
         : getOutput(input),
     {
-      type,
+      kind,
       requirement,
       message,
     }

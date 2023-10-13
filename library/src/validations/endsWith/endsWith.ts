@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates the end of a string.
@@ -15,7 +15,7 @@ export function endsWith<
 >(requirement: TRequirement, error?: ErrorMessage) {
   const kind = 'ends_with' as const;
   const message = error ?? 'Invalid end';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       !input.endsWith(requirement as any)
         ? getPipeIssues(kind, message, input)

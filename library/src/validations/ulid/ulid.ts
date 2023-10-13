@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates a [ULID](https://github.com/ulid/spec).
@@ -12,7 +12,7 @@ export function ulid<TInput extends string>(error?: ErrorMessage) {
   const kind = `ulid` as const;
   const requirement = /^[0-9A-HJKMNPQ-TV-Z]{26}$/i;
   const message = error ?? 'Invalid ULID';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       !requirement.test(input)
         ? getPipeIssues(kind, message, input)

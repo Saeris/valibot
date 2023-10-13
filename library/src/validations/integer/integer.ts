@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates whether a number is an integer.
@@ -11,7 +11,7 @@ import { getOutput, getPipeIssues } from '../../utils/index.ts';
 export function integer<TInput extends number>(error?: ErrorMessage) {
   const kind = 'integer' as const;
   const message = error ?? 'Invalid integer';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       !Number.isInteger(input)
         ? getPipeIssues(kind, message, input)

@@ -1,3 +1,4 @@
+export * from './assign.ts';
 export * from './executePipe/index.ts';
 export * from './getChecks/index.ts';
 export * from './getDefaultArgs/index.ts';

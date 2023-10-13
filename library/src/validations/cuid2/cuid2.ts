@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates a [cuid2](https://github.com/paralleldrive/cuid2#cuid2).
@@ -12,7 +12,7 @@ export function cuid2<TInput extends string>(error?: ErrorMessage) {
   const kind = 'cuid2' as const;
   const requirement = /^[a-z][a-z0-9]*$/;
   const message = error ?? 'Invalid cuid2';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       !requirement.test(input)
         ? getPipeIssues(kind, message, input)

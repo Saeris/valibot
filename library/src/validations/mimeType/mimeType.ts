@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates the MIME type of a file.
@@ -15,7 +15,7 @@ export function mimeType<
 >(requirement: TRequirement, error?: ErrorMessage) {
   const kind = 'mime_type' as const;
   const message = error ?? 'Invalid MIME type';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       !requirement.includes(input.type as `${string}/${string}`)
         ? getPipeIssues(kind, message, input)

@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates the start of a string.
@@ -15,7 +15,7 @@ export function startsWith<
 >(requirement: TRequirement, error?: ErrorMessage) {
   const kind = `starts_with` as const;
   const message = error ?? 'Invalid start';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       !input.startsWith(requirement as any)
         ? getPipeIssues(kind, message, input)

@@ -1,5 +1,10 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues, isLuhnAlgo } from '../../utils/index.ts';
+import {
+  assign,
+  getOutput,
+  getPipeIssues,
+  isLuhnAlgo,
+} from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates an IMEI.
@@ -14,7 +19,7 @@ export function imei<TInput extends string>(error?: ErrorMessage) {
   const kind = 'imei' as const;
   const requirement = /^\d{2}[ |/|-]?\d{6}[ |/|-]?\d{6}[ |/|-]?\d$/;
   const message = error ?? 'Invalid IMEI';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       !requirement.test(input) || !isLuhnAlgo(input)
         ? getPipeIssues(kind, message, input)

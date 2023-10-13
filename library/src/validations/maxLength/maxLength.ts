@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates the length of a string or array.
@@ -15,7 +15,7 @@ export function maxLength<
 >(requirement: TRequirement, error?: ErrorMessage) {
   const kind = 'max_length' as const;
   const message = error ?? 'Invalid length';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       input.length > requirement
         ? getPipeIssues(kind, message, input)

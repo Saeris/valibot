@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates the size of a map, set or blob.
@@ -15,7 +15,7 @@ export function minSize<
 >(requirement: TRequirement, error?: ErrorMessage) {
   const kind = 'min_size' as const;
   const message = error ?? 'Invalid size';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       input.size < requirement
         ? getPipeIssues(kind, message, input)

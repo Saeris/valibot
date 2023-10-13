@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates the value of a string, number or date.
@@ -15,7 +15,7 @@ export function maxValue<
 >(requirement: TRequirement, error?: ErrorMessage) {
   const kind = 'max_value' as const;
   const message = error ?? 'Invalid value';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       input > requirement
         ? getPipeIssues(kind, message, input)

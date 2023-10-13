@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a custom validation function.
@@ -15,7 +15,7 @@ export function custom<TInput>(
 ) {
   const kind = 'custom' as const;
   const message = error ?? 'Invalid input';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       !requirement(input)
         ? getPipeIssues(kind, message, input)

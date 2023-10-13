@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates a time with seconds.
@@ -14,7 +14,7 @@ export function isoTimeSecond<TInput extends string>(error?: ErrorMessage) {
   const kind = 'iso_time_second' as const;
   const requirement = /^(0[0-9]|1\d|2[0-3]):[0-5]\d:[0-5]\d$/;
   const message = error ?? 'Invalid time';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       !requirement.test(input)
         ? getPipeIssues(kind, message, input)

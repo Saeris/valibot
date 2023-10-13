@@ -1,5 +1,5 @@
 import type { ErrorMessage, PipeResult } from '../../types.ts';
-import { getOutput, getPipeIssues } from '../../utils/index.ts';
+import { assign, getOutput, getPipeIssues } from '../../utils/index.ts';
 
 /**
  * Creates a validation function that validates a week.
@@ -18,7 +18,7 @@ export function isoWeek<TInput extends string>(error?: ErrorMessage) {
   const kind = 'iso_week' as const;
   const requirement = /^\d{4}-W(0[1-9]|[1-4]\d|5[0-3])$/;
   const message = error ?? 'Invalid week';
-  return Object.assign(
+  return assign(
     (input: TInput): PipeResult<TInput> =>
       !requirement.test(input)
         ? getPipeIssues(kind, message, input)

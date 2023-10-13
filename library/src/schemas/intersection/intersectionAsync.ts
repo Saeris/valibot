@@ -4,7 +4,12 @@ import type {
   Issues,
   ParseInfoAsync,
 } from '../../types.ts';
-import { getIssues, getOutput, getSchemaIssues } from '../../utils/index.ts';
+import {
+  assign,
+  getIssues,
+  getOutput,
+  getSchemaIssues,
+} from '../../utils/index.ts';
 import type { IntersectionInput, IntersectionOutput } from './types.ts';
 import { mergeOutputs } from './utils/index.ts';
 
@@ -45,7 +50,7 @@ export function intersectionAsync<
   intersection: TIntersectionOptions,
   error?: string
 ): IntersectionSchemaAsync<TIntersectionOptions> {
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Create issues and outputs
       let issues: Issues | undefined;

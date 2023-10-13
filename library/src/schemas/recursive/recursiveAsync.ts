@@ -5,6 +5,7 @@ import type {
   Output,
   ParseInfoAsync,
 } from '../../types.ts';
+import { assign } from '../../utils/assign.ts';
 
 /**
  * Recursive schema async type.
@@ -30,7 +31,7 @@ export type RecursiveSchemaAsync<
 export function recursiveAsync<
   TSchemaGetter extends () => BaseSchema | BaseSchemaAsync
 >(getter: TSchemaGetter): RecursiveSchemaAsync<TSchemaGetter> {
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       return getter()(input, info);
     },

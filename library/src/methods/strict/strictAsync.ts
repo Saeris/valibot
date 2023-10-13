@@ -1,6 +1,6 @@
 import type { ObjectSchemaAsync } from '../../schemas/object/index.ts';
 import type { ErrorMessage, ParseInfoAsync } from '../../types.ts';
-import { getSchemaIssues } from '../../utils/index.ts';
+import { assign, getSchemaIssues } from '../../utils/index.ts';
 
 /**
  * Creates a strict async object schema that throws an error if an input
@@ -15,7 +15,7 @@ export function strictAsync<TSchema extends ObjectSchemaAsync<any>>(
   schema: TSchema,
   error?: ErrorMessage
 ): TSchema {
-  return Object.assign(async (input: unknown, info?: ParseInfoAsync) => {
+  return assign(async (input: unknown, info?: ParseInfoAsync) => {
     const result = await schema(input, info);
     return !result.issues &&
       Object.keys(input as object).some((key) => !(key in schema.object))

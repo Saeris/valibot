@@ -1,5 +1,5 @@
 import type { BaseSchema, ErrorMessage, ParseInfo } from '../../types.ts';
-import { getSchemaIssues, getOutput } from '../../utils/index.ts';
+import { getSchemaIssues, getOutput, assign } from '../../utils/index.ts';
 
 /**
  * Null schema type.
@@ -16,7 +16,7 @@ export type NullSchema<TOutput = null> = BaseSchema<null, TOutput> & {
  * @returns A null schema.
  */
 export function nullType(error?: ErrorMessage): NullSchema {
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (input !== null) {

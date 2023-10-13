@@ -5,7 +5,7 @@ import type {
   Output,
   ParseInfoAsync,
 } from '../../types.ts';
-import { getOutput } from '../../utils/index.ts';
+import { assign, getOutput } from '../../utils/index.ts';
 
 /**
  * Optional schema async type.
@@ -53,7 +53,7 @@ export function optionalAsync<
     typeof default_ === 'function'
       ? (default_ as () => TDefault)()
       : (default_ as TDefault);
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Get default or input value
       const value = input === undefined ? await getDefault() : input;

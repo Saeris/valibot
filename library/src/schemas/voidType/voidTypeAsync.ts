@@ -3,7 +3,7 @@ import type {
   ErrorMessage,
   ParseInfoAsync,
 } from '../../types.ts';
-import { getSchemaIssues, getOutput } from '../../utils/index.ts';
+import { getSchemaIssues, getOutput, assign } from '../../utils/index.ts';
 
 /**
  * Void schema async type.
@@ -20,7 +20,7 @@ export type VoidSchemaAsync<TOutput = void> = BaseSchemaAsync<void, TOutput> & {
  * @returns An async void schema.
  */
 export function voidTypeAsync(error?: ErrorMessage): VoidSchemaAsync {
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       if (typeof input !== 'undefined') {
         return getSchemaIssues(

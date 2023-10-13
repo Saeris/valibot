@@ -1,5 +1,5 @@
 import type { BaseSchema, ErrorMessage, ParseInfo } from '../../types.ts';
-import { getSchemaIssues, getOutput } from '../../utils/index.ts';
+import { getSchemaIssues, getOutput, assign } from '../../utils/index.ts';
 import type { Enum } from './types.ts';
 
 /**
@@ -28,7 +28,7 @@ export function enumType<TOption extends string, TEnum extends Enum<TOption>>(
   enumValue: TEnum,
   error?: ErrorMessage
 ): EnumSchema<TEnum> {
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (!enumValue.includes(input as any)) {

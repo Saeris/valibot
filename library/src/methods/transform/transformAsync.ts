@@ -76,7 +76,7 @@ import type {
   ParseInfoAsync,
   PipeAsync,
 } from '../../types.ts';
-import { executePipeAsync } from '../../utils/index.ts';
+import { assign, executePipeAsync } from '../../utils/index.ts';
 
 export function transformAsync<
   TSchema extends AnySchema | AnySchemaAsync,
@@ -407,7 +407,7 @@ export function transformAsync<
   pipe?: PipeAsync<TOutput>
 ): BaseSchemaAsync<Input<TSchema>, TOutput> {
   // @ts-expect-error
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Parse input with schema
       const result = await schema(input, info);
@@ -423,7 +423,6 @@ export function transformAsync<
       // And return pipe result
       return executePipeAsync(output, pipe, info, typeof output);
     },
-    schema,
-    { async: true } as const
+    { ...schema, async: true } as const
   );
 }

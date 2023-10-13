@@ -6,7 +6,7 @@ import type {
   Output,
   ParseInfo,
 } from '../../types.ts';
-import { getSchemaIssues, getOutput } from '../../utils/index.ts';
+import { getSchemaIssues, getOutput, assign } from '../../utils/index.ts';
 
 /**
  * Union options type.
@@ -43,7 +43,7 @@ export function union<TUnionOptions extends UnionOptions>(
   union: TUnionOptions,
   error?: ErrorMessage
 ): UnionSchema<TUnionOptions> {
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Create issues and output
       let issues: Issues | undefined;

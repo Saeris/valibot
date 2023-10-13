@@ -9,6 +9,7 @@ import type {
 } from '../../types.ts';
 import { getChecks } from '../../utils/getChecks/getChecks.ts';
 import {
+  assign,
   executePipeAsync,
   getIssues,
   getSchemaIssues,
@@ -129,7 +130,7 @@ export function tupleAsync<
   >(arg2, arg3, arg4);
 
   // Create and return async tuple schema
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (

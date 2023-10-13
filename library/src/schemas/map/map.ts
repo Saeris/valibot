@@ -8,6 +8,7 @@ import type {
   PipeMeta,
 } from '../../types.ts';
 import {
+  assign,
   executePipe,
   getChecks,
   getDefaultArgs,
@@ -78,7 +79,7 @@ export function map<TMapKey extends BaseSchema, TMapValue extends BaseSchema>(
   const [error, pipe] = getDefaultArgs(arg3, arg4);
 
   // Create and return map schema
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (!(input instanceof Map)) {

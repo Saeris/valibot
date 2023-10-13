@@ -1,5 +1,5 @@
 import type { BaseSchema, ErrorMessage, ParseInfo } from '../../types.ts';
-import { getSchemaIssues, getOutput } from '../../utils/index.ts';
+import { getSchemaIssues, getOutput, assign } from '../../utils/index.ts';
 
 /**
  * Undefined schema type.
@@ -19,7 +19,7 @@ export type UndefinedSchema<TOutput = undefined> = BaseSchema<
  * @returns A undefined schema.
  */
 export function undefinedType(error?: ErrorMessage): UndefinedSchema {
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (typeof input !== 'undefined') {

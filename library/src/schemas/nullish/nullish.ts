@@ -1,5 +1,5 @@
 import type { BaseSchema, Input, Output, ParseInfo } from '../../types.ts';
-import { getOutput } from '../../utils/index.ts';
+import { assign, getOutput } from '../../utils/index.ts';
 
 /**
  * Nullish schema type.
@@ -42,7 +42,7 @@ export function nullish<
       ? (default_ as () => TDefault)()
       : (default_ as TDefault);
 
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       let default_: TDefault;
       const value =

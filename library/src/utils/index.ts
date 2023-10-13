@@ -6,4 +6,5 @@ export * from './getIssues/index.ts';
 export * from './getOutput/index.ts';
 export * from './getPipeIssues/index.ts';
 export * from './getSchemaIssues/index.ts';
+export * from './isBaseSchema.ts';
 export * from './isLuhnAlgo/index.ts';

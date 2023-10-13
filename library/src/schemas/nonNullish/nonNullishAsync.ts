@@ -6,7 +6,7 @@ import type {
   Output,
   ParseInfoAsync,
 } from '../../types.ts';
-import { getSchemaIssues } from '../../utils/index.ts';
+import { assign, getSchemaIssues } from '../../utils/index.ts';
 import type { NonNullish } from './nonNullish.ts';
 
 /**
@@ -35,7 +35,7 @@ export function nonNullishAsync<TWrapped extends BaseSchema | BaseSchemaAsync>(
   wrapped: TWrapped,
   error?: ErrorMessage
 ): NonNullishSchemaAsync<TWrapped> {
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Prevent `null` and `undefined` values from passing
       if (input === null || input === undefined) {

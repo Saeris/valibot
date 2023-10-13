@@ -1,4 +1,5 @@
 import type { BaseSchema, Input, Output, ParseInfo } from '../../types.ts';
+import { assign } from '../../utils/assign.ts';
 
 /**
  * Recursive schema type.
@@ -24,7 +25,7 @@ export type RecursiveSchema<
 export function recursive<TSchemaGetter extends () => BaseSchema>(
   getter: TSchemaGetter
 ): RecursiveSchema<TSchemaGetter> {
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       return getter()(input, info);
     },

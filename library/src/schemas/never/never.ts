@@ -1,5 +1,5 @@
 import type { BaseSchema, ErrorMessage, ParseInfo } from '../../types.ts';
-import { getSchemaIssues } from '../../utils/index.ts';
+import { assign, getSchemaIssues } from '../../utils/index.ts';
 
 /**
  * Never schema type.
@@ -16,7 +16,7 @@ export type NeverSchema = BaseSchema<never> & {
  * @returns A never schema.
  */
 export function never(error?: ErrorMessage): NeverSchema {
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       return getSchemaIssues(
         info,

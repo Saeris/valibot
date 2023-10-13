@@ -6,7 +6,7 @@ import type {
   Output,
   ParseInfoAsync,
 } from '../../types.ts';
-import { getSchemaIssues } from '../../utils/index.ts';
+import { assign, getSchemaIssues } from '../../utils/index.ts';
 import type { NonOptional } from './nonOptional.ts';
 
 /**
@@ -35,7 +35,7 @@ export function nonOptionalAsync<TWrapped extends BaseSchema | BaseSchemaAsync>(
   wrapped: TWrapped,
   error?: ErrorMessage
 ): NonOptionalSchemaAsync<TWrapped> {
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Allow `undefined` values not to pass
       if (input === undefined) {

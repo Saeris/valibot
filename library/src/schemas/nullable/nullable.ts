@@ -1,5 +1,5 @@
 import type { BaseSchema, Input, Output, ParseInfo } from '../../types.ts';
-import { getOutput } from '../../utils/index.ts';
+import { assign, getOutput } from '../../utils/index.ts';
 
 /**
  * Nullable schema type.
@@ -42,7 +42,7 @@ export function nullable<
       ? (default_ as () => TDefault)()
       : (default_ as TDefault);
 
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Get default or input value
       let default_: TDefault;

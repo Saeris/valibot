@@ -1,5 +1,5 @@
 import type { BaseSchema, ErrorMessage, ParseInfo } from '../../types.ts';
-import { getSchemaIssues, getOutput } from '../../utils/index.ts';
+import { getSchemaIssues, getOutput, assign } from '../../utils/index.ts';
 import type { Literal } from './types.ts';
 
 /**
@@ -28,7 +28,7 @@ export function literal<TLiteral extends Literal>(
   literal: TLiteral,
   error?: ErrorMessage
 ): LiteralSchema<TLiteral> {
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (input !== literal) {

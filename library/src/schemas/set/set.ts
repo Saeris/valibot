@@ -7,6 +7,7 @@ import type {
   PipeMeta,
 } from '../../types.ts';
 import {
+  assign,
   executePipe,
   getChecks,
   getDefaultArgs,
@@ -71,7 +72,7 @@ export function set<TSetValue extends BaseSchema>(
   const [error, pipe] = getDefaultArgs(arg2, arg3);
 
   // Create and return set schema
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (!(input instanceof Set)) {

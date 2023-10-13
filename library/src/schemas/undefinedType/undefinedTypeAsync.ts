@@ -3,7 +3,7 @@ import type {
   ErrorMessage,
   ParseInfoAsync,
 } from '../../types.ts';
-import { getSchemaIssues, getOutput } from '../../utils/index.ts';
+import { getSchemaIssues, getOutput, assign } from '../../utils/index.ts';
 
 /**
  * Undefined schema async type.
@@ -23,7 +23,7 @@ export type UndefinedSchemaAsync<TOutput = undefined> = BaseSchemaAsync<
  * @returns An async undefined schema.
  */
 export function undefinedTypeAsync(error?: ErrorMessage): UndefinedSchemaAsync {
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (typeof input !== 'undefined') {

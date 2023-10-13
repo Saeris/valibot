@@ -4,7 +4,7 @@ import type {
   PipeAsync,
   PipeMeta,
 } from '../../types.ts';
-import { executePipeAsync, getChecks } from '../../utils/index.ts';
+import { assign, executePipeAsync, getChecks } from '../../utils/index.ts';
 
 /**
  * Any schema type.
@@ -26,7 +26,7 @@ export type AnySchemaAsync<TOutput = any> = BaseSchemaAsync<any, TOutput> & {
  * @returns An async any schema.
  */
 export function anyAsync(pipe: PipeAsync<any> = []): AnySchemaAsync {
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       return executePipeAsync(input, pipe, info, 'any');
     },

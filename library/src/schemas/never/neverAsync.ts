@@ -3,7 +3,7 @@ import type {
   ErrorMessage,
   ParseInfoAsync,
 } from '../../types.ts';
-import { getSchemaIssues } from '../../utils/index.ts';
+import { assign, getSchemaIssues } from '../../utils/index.ts';
 
 /**
  * Never schema async type.
@@ -20,7 +20,7 @@ export type NeverSchemaAsync = BaseSchemaAsync<never> & {
  * @returns An async never schema.
  */
 export function neverAsync(error?: ErrorMessage): NeverSchemaAsync {
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       return getSchemaIssues(
         info,

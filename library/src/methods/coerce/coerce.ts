@@ -1,4 +1,5 @@
 import type { BaseSchema, Input, ParseInfo } from '../../types.ts';
+import { assign } from '../../utils/assign.ts';
 
 /**
  * Coerces the input of a schema to match the required type.
@@ -12,7 +13,7 @@ export function coerce<TSchema extends BaseSchema>(
   schema: TSchema,
   action: (value: unknown) => Input<TSchema>
 ): TSchema {
-  return Object.assign((input: unknown, info?: ParseInfo) => {
+  return assign((input: unknown, info?: ParseInfo) => {
     return schema(action(input), info);
   }, schema);
 }

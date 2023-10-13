@@ -1,6 +1,6 @@
 import type { ObjectSchema } from '../../schemas/object/index.ts';
 import type { ParseInfo } from '../../types.ts';
-import { getOutput } from '../../utils/index.ts';
+import { assign, getOutput } from '../../utils/index.ts';
 
 /**
  * Creates an object schema that strips unknown keys.
@@ -16,7 +16,7 @@ export function strip<TSchema extends ObjectSchema<any>>(
   let cachedKeys: string[];
 
   // Create and return object schema
-  return Object.assign((input: unknown, info?: ParseInfo) => {
+  return assign((input: unknown, info?: ParseInfo) => {
     // Get parse result of schema
     const result = schema(input, info);
 

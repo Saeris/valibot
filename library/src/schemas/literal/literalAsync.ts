@@ -3,7 +3,7 @@ import type {
   ErrorMessage,
   ParseInfoAsync,
 } from '../../types.ts';
-import { getSchemaIssues, getOutput } from '../../utils/index.ts';
+import { getSchemaIssues, getOutput, assign } from '../../utils/index.ts';
 import type { Literal } from './types.ts';
 
 /**
@@ -32,7 +32,7 @@ export function literalAsync<TLiteral extends Literal>(
   literal: TLiteral,
   error?: ErrorMessage
 ): LiteralSchemaAsync<TLiteral> {
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (input !== literal) {

@@ -10,6 +10,7 @@ import type {
 } from '../../types.ts';
 import { getChecks } from '../../utils/getChecks/getChecks.ts';
 import {
+  assign,
   executePipe,
   getDefaultArgs,
   getIssues,
@@ -73,7 +74,7 @@ export function array<TArrayItem extends BaseSchema>(
   const [error, pipe] = getDefaultArgs(arg2, arg3);
 
   // Create and return array schema
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (!Array.isArray(input)) {

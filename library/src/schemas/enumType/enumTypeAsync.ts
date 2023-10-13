@@ -3,7 +3,7 @@ import type {
   ErrorMessage,
   ParseInfoAsync,
 } from '../../types.ts';
-import { getSchemaIssues, getOutput } from '../../utils/index.ts';
+import { getSchemaIssues, getOutput, assign } from '../../utils/index.ts';
 import type { Enum } from './types.ts';
 
 /**
@@ -32,7 +32,7 @@ export function enumTypeAsync<
   TOption extends string,
   TEnum extends Enum<TOption>
 >(enumValue: TEnum, error?: ErrorMessage): EnumSchemaAsync<TEnum> {
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (!enumValue.includes(input as any)) {

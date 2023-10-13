@@ -4,7 +4,7 @@ import type {
   Output,
   ParseInfoAsync,
 } from '../../types.ts';
-import { getOutput } from '../../utils/index.ts';
+import { assign, getOutput } from '../../utils/index.ts';
 import type { FallbackInfo } from './types.ts';
 
 /**
@@ -19,7 +19,7 @@ export function fallbackAsync<TSchema extends BaseSchema | BaseSchemaAsync>(
   schema: TSchema,
   value: Output<TSchema> | ((info: FallbackInfo) => Output<TSchema>)
 ): TSchema {
-  return Object.assign(async (input: unknown, info?: ParseInfoAsync) => {
+  return assign(async (input: unknown, info?: ParseInfoAsync) => {
     const result = await schema(input, info);
     return getOutput(
       result.issues

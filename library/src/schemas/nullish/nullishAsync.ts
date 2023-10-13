@@ -5,7 +5,7 @@ import type {
   Output,
   ParseInfoAsync,
 } from '../../types.ts';
-import { getOutput } from '../../utils/index.ts';
+import { assign, getOutput } from '../../utils/index.ts';
 
 /**
  * Nullish schema async type.
@@ -54,7 +54,7 @@ export function nullishAsync<
       ? (default_ as () => TDefault)()
       : (default_ as TDefault);
 
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Get default or input value
       let default_: Awaited<TDefault>;

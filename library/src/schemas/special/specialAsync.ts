@@ -6,6 +6,7 @@ import type {
   PipeMeta,
 } from '../../types.ts';
 import {
+  assign,
   executePipeAsync,
   getChecks,
   getDefaultArgs,
@@ -64,7 +65,7 @@ export function specialAsync<TInput>(
   const [error, pipe] = getDefaultArgs(arg2, arg3);
 
   // Create and return string schema
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (!(await check(input))) {

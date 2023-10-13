@@ -1,6 +1,6 @@
 import type { ObjectSchemaAsync } from '../../schemas/object/index.ts';
 import type { ParseInfoAsync } from '../../types.ts';
-import { getOutput } from '../../utils/index.ts';
+import { assign, getOutput } from '../../utils/index.ts';
 
 /**
  * Creates an object schema that strips unknown keys.
@@ -16,7 +16,7 @@ export function stripAsync<TSchema extends ObjectSchemaAsync<any>>(
   let cachedKeys: string[];
 
   // Create and return object schema
-  return Object.assign(async (input: unknown, info?: ParseInfoAsync) => {
+  return assign(async (input: unknown, info?: ParseInfoAsync) => {
     // Get parse result of schema
     const result = await schema(input, info);
 

@@ -5,7 +5,7 @@ import type {
   Output,
   ParseInfo,
 } from '../../types.ts';
-import { getSchemaIssues } from '../../utils/index.ts';
+import { assign, getSchemaIssues } from '../../utils/index.ts';
 
 /**
  * Non nullish type.
@@ -38,7 +38,7 @@ export function nonNullish<TWrapped extends BaseSchema>(
   wrapped: TWrapped,
   error?: ErrorMessage
 ): NonNullishSchema<TWrapped> {
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Prevent `null` and `undefined` values from passing
       if (input === null || input === undefined) {

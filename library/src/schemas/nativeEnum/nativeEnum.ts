@@ -1,5 +1,5 @@
 import type { BaseSchema, ErrorMessage, ParseInfo } from '../../types.ts';
-import { getSchemaIssues, getOutput } from '../../utils/index.ts';
+import { getSchemaIssues, getOutput, assign } from '../../utils/index.ts';
 
 /**
  * Native enum type.
@@ -35,7 +35,7 @@ export function nativeEnum<TNativeEnum extends NativeEnum>(
   nativeEnum: TNativeEnum,
   error?: ErrorMessage
 ): NativeEnumSchema<TNativeEnum> {
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (!Object.values(nativeEnum).includes(input as any)) {

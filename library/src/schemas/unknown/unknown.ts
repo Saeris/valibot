@@ -1,6 +1,6 @@
 import type { BaseSchema, ParseInfo, Pipe, PipeMeta } from '../../types.ts';
 import { getChecks } from '../../utils/getChecks/getChecks.ts';
-import { executePipe } from '../../utils/index.ts';
+import { assign, executePipe } from '../../utils/index.ts';
 
 /**
  * Unknown schema type.
@@ -22,7 +22,7 @@ export type UnknownSchema<TOutput = unknown> = BaseSchema<unknown, TOutput> & {
  * @returns A unknown schema.
  */
 export function unknown(pipe: Pipe<unknown> = []): UnknownSchema {
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       return executePipe(input, pipe, info, 'unknown');
     },

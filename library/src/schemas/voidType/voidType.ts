@@ -1,5 +1,5 @@
 import type { BaseSchema, ErrorMessage, ParseInfo } from '../../types.ts';
-import { getSchemaIssues, getOutput } from '../../utils/index.ts';
+import { getSchemaIssues, getOutput, assign } from '../../utils/index.ts';
 
 /**
  * Void schema type.
@@ -16,7 +16,7 @@ export type VoidSchema<TOutput = void> = BaseSchema<void, TOutput> & {
  * @returns A void schema.
  */
 export function voidType(error?: ErrorMessage): VoidSchema {
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       if (typeof input !== 'undefined') {
         return getSchemaIssues(

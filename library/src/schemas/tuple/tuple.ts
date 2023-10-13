@@ -7,7 +7,12 @@ import type {
   PipeMeta,
 } from '../../types.ts';
 import { getChecks } from '../../utils/getChecks/getChecks.ts';
-import { executePipe, getIssues, getSchemaIssues } from '../../utils/index.ts';
+import {
+  assign,
+  executePipe,
+  getIssues,
+  getSchemaIssues,
+} from '../../utils/index.ts';
 import type { TupleOutput, TupleInput, TuplePathItem } from './types.ts';
 import { getTupleArgs } from './utils/index.ts';
 
@@ -118,7 +123,7 @@ export function tuple<
   >(arg2, arg3, arg4);
 
   // Create and return tuple schema
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (

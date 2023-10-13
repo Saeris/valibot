@@ -5,7 +5,7 @@ import type {
   Output,
   ParseInfo,
 } from '../../types.ts';
-import { getSchemaIssues } from '../../utils/index.ts';
+import { assign, getSchemaIssues } from '../../utils/index.ts';
 
 /**
  * Non nullable type.
@@ -38,7 +38,7 @@ export function nonNullable<TWrapped extends BaseSchema>(
   wrapped: TWrapped,
   error?: ErrorMessage
 ): NonNullableSchema<TWrapped> {
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Prevent `null` values from passing
       if (input === null) {

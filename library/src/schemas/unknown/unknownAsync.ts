@@ -5,7 +5,7 @@ import type {
   PipeMeta,
 } from '../../types.ts';
 import { getChecks } from '../../utils/getChecks/getChecks.ts';
-import { executePipeAsync } from '../../utils/index.ts';
+import { assign, executePipeAsync } from '../../utils/index.ts';
 
 /**
  * Unknown schema async type.
@@ -32,7 +32,7 @@ export type UnknownSchemaAsync<TOutput = unknown> = BaseSchemaAsync<
 export function unknownAsync(
   pipe: PipeAsync<unknown> = []
 ): UnknownSchemaAsync {
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       return executePipeAsync(input, pipe, info, 'unknown');
     },

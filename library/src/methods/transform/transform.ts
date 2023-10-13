@@ -41,7 +41,7 @@ import type {
   ParseInfo,
   Pipe,
 } from '../../types.ts';
-import { executePipe } from '../../utils/index.ts';
+import { assign, executePipe } from '../../utils/index.ts';
 
 export function transform<TSchema extends AnySchema, TOutput>(
   schema: TSchema,
@@ -261,7 +261,7 @@ export function transform<TSchema extends BaseSchema, TOutput>(
   action: (value: Output<TSchema>) => TOutput,
   pipe?: Pipe<TOutput>
 ): BaseSchema<Input<TSchema>, TOutput> {
-  return Object.assign((input: unknown, info?: ParseInfo) => {
+  return assign((input: unknown, info?: ParseInfo) => {
     // Parse input with schema
     const result = schema(input, info);
 

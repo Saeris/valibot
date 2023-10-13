@@ -3,7 +3,7 @@ import type {
   ErrorMessage,
   ParseInfoAsync,
 } from '../../types.ts';
-import { getSchemaIssues, getOutput } from '../../utils/index.ts';
+import { getSchemaIssues, getOutput, assign } from '../../utils/index.ts';
 import type { NativeEnum } from './nativeEnum.ts';
 
 /**
@@ -32,7 +32,7 @@ export function nativeEnumAsync<TNativeEnum extends NativeEnum>(
   nativeEnum: TNativeEnum,
   error?: ErrorMessage
 ): NativeEnumSchemaAsync<TNativeEnum> {
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (!Object.values(nativeEnum).includes(input as any)) {

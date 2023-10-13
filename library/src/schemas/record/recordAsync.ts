@@ -8,6 +8,7 @@ import type {
   PipeMeta,
 } from '../../types.ts';
 import {
+  assign,
   executePipeAsync,
   getChecks,
   getIssues,
@@ -143,7 +144,7 @@ export function recordAsync<
   >(arg1, arg2, arg3, arg4);
 
   // Create and return async record schema
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (!input || typeof input !== 'object') {

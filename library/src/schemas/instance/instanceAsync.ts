@@ -7,6 +7,7 @@ import type {
 } from '../../types.ts';
 import { getChecks } from '../../utils/getChecks/getChecks.ts';
 import {
+  assign,
   executePipeAsync,
   getDefaultArgs,
   getSchemaIssues,
@@ -69,7 +70,7 @@ export function instanceAsync<TClass extends Class>(
   const [error, pipe] = getDefaultArgs(arg2, arg3);
 
   // Create and return string schema
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (!(input instanceof of)) {

@@ -7,6 +7,7 @@ import type {
 } from '../../types.ts';
 import { getChecks } from '../../utils/getChecks/getChecks.ts';
 import {
+  assign,
   executePipe,
   getDefaultArgs,
   getSchemaIssues,
@@ -51,7 +52,7 @@ export function blob(
   const [error, pipe] = getDefaultArgs(arg1, arg2);
 
   // Create and return blob schema
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (!(input instanceof Blob)) {

@@ -1,5 +1,10 @@
 import type { BaseSchema, Issues, ParseInfo } from '../../types.ts';
-import { getIssues, getOutput, getSchemaIssues } from '../../utils/index.ts';
+import {
+  assign,
+  getIssues,
+  getOutput,
+  getSchemaIssues,
+} from '../../utils/index.ts';
 import type { IntersectionInput, IntersectionOutput } from './types.ts';
 import { mergeOutputs } from './utils/index.ts';
 
@@ -38,7 +43,7 @@ export function intersection<TIntersectionOptions extends IntersectionOptions>(
   intersection: TIntersectionOptions,
   error?: string
 ): IntersectionSchema<TIntersectionOptions> {
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Create issues and outputs
       let issues: Issues | undefined;

@@ -5,7 +5,7 @@ import type {
   Output,
   ParseInfo,
 } from '../../types.ts';
-import { getSchemaIssues } from '../../utils/index.ts';
+import { assign, getSchemaIssues } from '../../utils/index.ts';
 
 /**
  * Non optional type.
@@ -38,7 +38,7 @@ export function nonOptional<TWrapped extends BaseSchema>(
   wrapped: TWrapped,
   error?: ErrorMessage
 ): NonOptionalSchema<TWrapped> {
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Allow `undefined` values not to pass
       if (input === undefined) {

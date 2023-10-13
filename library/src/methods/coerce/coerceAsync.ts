@@ -1,4 +1,5 @@
 import type { BaseSchemaAsync, Input, ParseInfoAsync } from '../../types.ts';
+import { assign } from '../../utils/assign.ts';
 
 /**
  * Coerces the input of a async schema to match the required type.
@@ -12,7 +13,7 @@ export function coerceAsync<TSchema extends BaseSchemaAsync>(
   schema: TSchema,
   action: (value: unknown) => Input<TSchema> | Promise<Input<TSchema>>
 ): TSchema {
-  return Object.assign(async (input: unknown, info?: ParseInfoAsync) => {
+  return assign(async (input: unknown, info?: ParseInfoAsync) => {
     return schema(await action(input), info);
   }, schema);
 }

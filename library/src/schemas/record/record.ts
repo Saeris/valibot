@@ -7,6 +7,7 @@ import type {
   PipeMeta,
 } from '../../types.ts';
 import {
+  assign,
   executePipe,
   getChecks,
   getIssues,
@@ -135,7 +136,7 @@ export function record<
   >(arg1, arg2, arg3, arg4);
 
   // Create and return record schema
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (!input || typeof input !== 'object') {

@@ -7,6 +7,7 @@ import type {
   PipeMeta,
 } from '../../types.ts';
 import {
+  assign,
   executePipe,
   getChecks,
   getDefaultArgs,
@@ -79,7 +80,7 @@ export function object<TObjectShape extends ObjectShape>(
   let cachedEntries: [string, BaseSchema<any>][];
 
   // Create and return object schema
-  return Object.assign(
+  return assign(
     (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (!input || typeof input !== 'object') {

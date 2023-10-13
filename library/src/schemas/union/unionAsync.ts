@@ -7,7 +7,7 @@ import type {
   Output,
   ParseInfoAsync,
 } from '../../types.ts';
-import { getSchemaIssues, getOutput } from '../../utils/index.ts';
+import { getSchemaIssues, getOutput, assign } from '../../utils/index.ts';
 
 /**
  * Union options async type.
@@ -44,7 +44,7 @@ export function unionAsync<TUnionOptions extends UnionOptionsAsync>(
   union: TUnionOptions,
   error?: ErrorMessage
 ): UnionSchemaAsync<TUnionOptions> {
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Create issues and output
       let issues: Issues | undefined;

@@ -9,6 +9,7 @@ import type {
   PipeMeta,
 } from '../../types.ts';
 import {
+  assign,
   executePipeAsync,
   getChecks,
   getDefaultArgs,
@@ -88,7 +89,7 @@ export function mapAsync<
   const [error, pipe] = getDefaultArgs(arg3, arg4);
 
   // Create and return async map schema
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (!(input instanceof Map)) {

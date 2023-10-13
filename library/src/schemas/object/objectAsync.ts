@@ -8,6 +8,7 @@ import type {
   PipeMeta,
 } from '../../types.ts';
 import {
+  assign,
   executePipeAsync,
   getChecks,
   getDefaultArgs,
@@ -83,7 +84,7 @@ export function objectAsync<TObjectShape extends ObjectShapeAsync>(
   let cachedEntries: [string, BaseSchema<any> | BaseSchemaAsync<any>][];
 
   // Create and return async object schema
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (!input || typeof input !== 'object') {

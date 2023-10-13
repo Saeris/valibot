@@ -7,6 +7,7 @@ import type {
 } from '../../types.ts';
 import { getChecks } from '../../utils/getChecks/getChecks.ts';
 import {
+  assign,
   executePipeAsync,
   getDefaultArgs,
   getSchemaIssues,
@@ -57,7 +58,7 @@ export function numberAsync(
   const [error, pipe] = getDefaultArgs(arg1, arg2);
 
   // Create and return async number schema
-  return Object.assign(
+  return assign(
     async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (typeof input !== 'number' || Number.isNaN(input)) {

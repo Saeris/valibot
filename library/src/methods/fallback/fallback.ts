@@ -1,5 +1,5 @@
 import type { BaseSchema, Output, ParseInfo } from '../../types.ts';
-import { getOutput } from '../../utils/index.ts';
+import { assign, getOutput } from '../../utils/index.ts';
 import type { FallbackInfo } from './types.ts';
 
 /**
@@ -14,7 +14,7 @@ export function fallback<TSchema extends BaseSchema>(
   schema: TSchema,
   value: Output<TSchema> | ((info: FallbackInfo) => Output<TSchema>)
 ): TSchema {
-  return Object.assign((input: unknown, info?: ParseInfo) => {
+  return assign((input: unknown, info?: ParseInfo) => {
     const result = schema(input, info);
     return getOutput(
       result.issues

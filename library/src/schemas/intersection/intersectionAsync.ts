@@ -1,4 +1,9 @@
-import type { BaseSchema, BaseSchemaAsync, Issues } from '../../types.ts';
+import type {
+  BaseSchema,
+  BaseSchemaAsync,
+  Issues,
+  ParseInfoAsync,
+} from '../../types.ts';
 import { getIssues, getOutput, getSchemaIssues } from '../../utils/index.ts';
 import type { IntersectionInput, IntersectionOutput } from './types.ts';
 import { mergeOutputs } from './utils/index.ts';
@@ -19,7 +24,10 @@ export type IntersectionSchemaAsync<
   TIntersectionOptions extends IntersectionOptionsAsync,
   TOutput = IntersectionOutput<TIntersectionOptions>
 > = BaseSchemaAsync<IntersectionInput<TIntersectionOptions>, TOutput> & {
-  schema: 'intersection';
+  kind: 'intersection';
+  /**
+   * The intersection schema.
+   */
   intersection: TIntersectionOptions;
 };
 
@@ -37,31 +45,8 @@ export function intersectionAsync<
   intersection: TIntersectionOptions,
   error?: string
 ): IntersectionSchemaAsync<TIntersectionOptions> {
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'intersection',
-
-    /**
-     * The intersection schema.
-     */
-    intersection,
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
       // Create issues and outputs
       let issues: Issues | undefined;
       let outputs: [any, ...any] | undefined;
@@ -71,7 +56,7 @@ export function intersectionAsync<
         intersection.map(async (schema) => {
           // If not aborted early, continue execution
           if (!(info?.abortEarly && issues)) {
-            const result = await schema._parse(input, info);
+            const result = await schema(input, info);
 
             // If not aborted early, continue execution
             if (!(info?.abortEarly && issues)) {
@@ -133,5 +118,10 @@ export function intersectionAsync<
       // Return merged output
       return getOutput(output);
     },
-  };
+    {
+      kind: 'intersection',
+      async: true,
+      intersection,
+    } as const
+  );
 }

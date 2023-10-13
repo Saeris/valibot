@@ -3,6 +3,7 @@ import type {
   BaseSchemaAsync,
   ErrorMessage,
   Issues,
+  ParseInfoAsync,
   PipeAsync,
   PipeMeta,
 } from '../../types.ts';
@@ -30,8 +31,15 @@ export type ObjectSchemaAsync<
   TObjectShape extends ObjectShapeAsync,
   TOutput = ObjectOutput<TObjectShape>
 > = BaseSchemaAsync<ObjectInput<TObjectShape>, TOutput> & {
-  schema: 'object';
+  kind: 'object';
+  /**
+   * The object schema.
+   */
   object: TObjectShape;
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -75,37 +83,8 @@ export function objectAsync<TObjectShape extends ObjectShapeAsync>(
   let cachedEntries: [string, BaseSchema<any> | BaseSchemaAsync<any>][];
 
   // Create and return async object schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'object',
-
-    /**
-     * The object schema.
-     */
-    object,
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (!input || typeof input !== 'object') {
         return getSchemaIssues(
@@ -133,7 +112,7 @@ export function objectAsync<TObjectShape extends ObjectShapeAsync>(
             const value = (input as Record<string, unknown>)[key];
 
             // Get parse result of value
-            const result = await schema._parse(value, info);
+            const result = await schema(value, info);
 
             // If not aborted early, continue execution
             if (!(info?.abortEarly && issues)) {
@@ -184,5 +163,11 @@ export function objectAsync<TObjectShape extends ObjectShapeAsync>(
             'object'
           );
     },
-  };
+    {
+      kind: 'object',
+      async: true,
+      object,
+      checks: getChecks(pipe),
+    } as const
+  );
 }

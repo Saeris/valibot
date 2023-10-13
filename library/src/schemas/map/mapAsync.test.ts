@@ -76,7 +76,7 @@ describe('mapAsync', () => {
   test('should return issue path', async () => {
     const schema1 = mapAsync(string(), number());
     const input1 = new Map().set('A', 1).set('B', 2).set('C', '3');
-    const result1 = await schema1._parse(input1);
+    const result1 = await schema1(input1);
     expect(result1.issues?.[0].path).toEqual([
       {
         schema: 'map',
@@ -91,7 +91,7 @@ describe('mapAsync', () => {
       .set('A', { key: '1' })
       .set('B', { key: 2 })
       .set('C', { key: '3' });
-    const result2 = await schema2._parse(input2);
+    const result2 = await schema2(input2);
     expect(result2.issues?.[0].origin).toBe('value');
     expect(result2.issues?.[0].path).toEqual([
       {
@@ -114,7 +114,7 @@ describe('mapAsync', () => {
       .set({ key: '1' }, 'A')
       .set(errorKey, 'B')
       .set({ key: '3' }, 'C');
-    const result3 = await schema3._parse(input3);
+    const result3 = await schema3(input3);
     expect(result3.issues?.[0].origin).toBe('key');
     expect(result3.issues?.[0].path).toEqual([
       {

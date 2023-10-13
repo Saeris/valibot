@@ -1,4 +1,5 @@
 import type { ObjectSchema } from '../../schemas/object/index.ts';
+import type { ParseInfo } from '../../types.ts';
 import { getOutput } from '../../utils/index.ts';
 
 /**
@@ -15,37 +16,25 @@ export function strip<TSchema extends ObjectSchema<any>>(
   let cachedKeys: string[];
 
   // Create and return object schema
-  return {
-    ...schema,
+  return Object.assign((input: unknown, info?: ParseInfo) => {
+    // Get parse result of schema
+    const result = schema(input, info);
 
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
-      // Get parse result of schema
-      const result = schema._parse(input, info);
+    // Return result if there are issues
+    if (result.issues) {
+      return result;
+    }
 
-      // Return result if there are issues
-      if (result.issues) {
-        return result;
-      }
+    // Cache object keys lazy
+    cachedKeys = cachedKeys || Object.keys(schema.object);
 
-      // Cache object keys lazy
-      cachedKeys = cachedKeys || Object.keys(schema.object);
+    // Strip unknown keys
+    const output: Record<string, any> = {};
+    for (const key of cachedKeys) {
+      output[key] = result.output[key];
+    }
 
-      // Strip unknown keys
-      const output: Record<string, any> = {};
-      for (const key of cachedKeys) {
-        output[key] = result.output[key];
-      }
-
-      // Return stripped output
-      return getOutput(output);
-    },
-  };
+    // Return stripped output
+    return getOutput(output);
+  }, schema);
 }

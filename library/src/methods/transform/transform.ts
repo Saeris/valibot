@@ -34,7 +34,13 @@ import type {
   UnknownSchema,
   VoidSchema,
 } from '../../schemas/index.ts';
-import type { BaseSchema, Input, Output, Pipe } from '../../types.ts';
+import type {
+  BaseSchema,
+  Input,
+  Output,
+  ParseInfo,
+  Pipe,
+} from '../../types.ts';
 import { executePipe } from '../../utils/index.ts';
 
 export function transform<TSchema extends AnySchema, TOutput>(
@@ -255,31 +261,19 @@ export function transform<TSchema extends BaseSchema, TOutput>(
   action: (value: Output<TSchema>) => TOutput,
   pipe?: Pipe<TOutput>
 ): BaseSchema<Input<TSchema>, TOutput> {
-  return {
-    ...schema,
+  return Object.assign((input: unknown, info?: ParseInfo) => {
+    // Parse input with schema
+    const result = schema(input, info);
 
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
-      // Parse input with schema
-      const result = schema._parse(input, info);
+    // If there are issues, return them
+    if (result.issues) {
+      return result;
+    }
 
-      // If there are issues, return them
-      if (result.issues) {
-        return result;
-      }
+    // Otherwise, transform output
+    const output = action(result.output);
 
-      // Otherwise, transform output
-      const output = action(result.output);
-
-      // And return pipe result
-      return executePipe(output, pipe, info, typeof output);
-    },
-  };
+    // And return pipe result
+    return executePipe(output, pipe, info, typeof output);
+  }, schema);
 }

@@ -2,6 +2,7 @@ import type {
   BaseSchema,
   ErrorMessage,
   Issues,
+  ParseInfo,
   Pipe,
   PipeMeta,
 } from '../../types.ts';
@@ -23,8 +24,15 @@ export type TupleSchema<
   TTupleRest extends BaseSchema | undefined = undefined,
   TOutput = TupleOutput<TTupleItems, TTupleRest>
 > = BaseSchema<TupleInput<TTupleItems, TTupleRest>, TOutput> & {
-  schema: 'tuple';
+  kind: 'tuple';
+  /**
+   * The tuple items and rest schema.
+   */
   tuple: { items: TTupleItems; rest: TTupleRest };
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -110,42 +118,16 @@ export function tuple<
   >(arg2, arg3, arg4);
 
   // Create and return tuple schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'tuple',
-
-    /**
-     * The tuple items and rest schema.
-     */
-    tuple: { items, rest },
-
-    /**
-     * Whether it's async.
-     */
-    async: false,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
+  return Object.assign(
+    (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (
+        // Not an array
         !Array.isArray(input) ||
+        // No rest type and unequal lengths
         (!rest && items.length !== input.length) ||
-        (rest && items.length > input.length)
+        // Rest type provided and too few items
+        (!!rest && items.length > input.length)
       ) {
         return getSchemaIssues(
           info,
@@ -163,7 +145,7 @@ export function tuple<
       // Parse schema of each tuple item
       for (let key = 0; key < items.length; key++) {
         const value = input[key];
-        const result = items[key]._parse(value, info);
+        const result = items[key](value, info);
 
         // If there are issues, capture them
         if (result.issues) {
@@ -203,7 +185,7 @@ export function tuple<
       if (rest) {
         for (let key = items.length; key < input.length; key++) {
           const value = input[key];
-          const result = rest._parse(value, info);
+          const result = rest(value, info);
 
           // If there are issues, capture them
           if (result.issues) {
@@ -250,5 +232,11 @@ export function tuple<
             'tuple'
           );
     },
-  };
+    {
+      kind: 'tuple',
+      async: false,
+      tuple: { items, rest },
+      checks: getChecks(pipe),
+    } as const
+  );
 }

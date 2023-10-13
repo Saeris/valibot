@@ -1,4 +1,4 @@
-import type { BaseSchema, Input, Output } from '../../types.ts';
+import type { BaseSchema, Input, Output, ParseInfo } from '../../types.ts';
 import { getOutput } from '../../utils/index.ts';
 
 /**
@@ -11,8 +11,14 @@ export type OptionalSchema<
     ? Output<TWrapped> | undefined
     : Output<TWrapped>
 > = BaseSchema<Input<TWrapped> | undefined, TOutput> & {
-  schema: 'optional';
+  kind: 'optional';
+  /**
+   * The wrapped schema.
+   */
   wrapped: TWrapped;
+  /**
+   * The default value.
+   */
   get default(): TDefault;
 };
 
@@ -31,42 +37,15 @@ export function optional<
   wrapped: TWrapped,
   default_?: TDefault | (() => TDefault)
 ): OptionalSchema<TWrapped, TDefault> {
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'optional',
+  const getDefault = () =>
+    typeof default_ === 'function'
+      ? (default_ as () => TDefault)()
+      : (default_ as TDefault);
 
-    /**
-     * The wrapped schema.
-     */
-    wrapped,
-
-    /**
-     * The default value.
-     */
-    get default() {
-      return typeof default_ === 'function'
-        ? (default_ as () => TDefault)()
-        : (default_ as TDefault);
-    },
-
-    /**
-     * Whether it's async.
-     */
-    async: false,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
+  return Object.assign(
+    (input: unknown, info?: ParseInfo) => {
       // Get default or input value
-      const value = input === undefined ? this.default : input;
+      const value = input === undefined ? getDefault() : input;
 
       // Allow `undefined` value to pass
       if (value === undefined) {
@@ -74,7 +53,15 @@ export function optional<
       }
 
       // Return result of wrapped schema
-      return wrapped._parse(value, info);
+      return wrapped(value, info);
     },
-  };
+    {
+      kind: 'optional',
+      async: false,
+      wrapped,
+      get default() {
+        return getDefault();
+      },
+    } as const
+  );
 }

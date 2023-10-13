@@ -16,7 +16,7 @@ export function safeParse<TSchema extends BaseSchema>(
   input: unknown,
   info?: Pick<ParseInfo, 'abortEarly' | 'abortPipeEarly' | 'skipPipe'>
 ): SafeParseResult<TSchema> {
-  const result = schema._parse(input, info);
+  const result = schema(input, info);
   return result.issues
     ? {
         success: false,

@@ -1,4 +1,10 @@
-import type { BaseSchema, ErrorMessage, Pipe, PipeMeta } from '../../types.ts';
+import type {
+  BaseSchema,
+  ErrorMessage,
+  ParseInfo,
+  Pipe,
+  PipeMeta,
+} from '../../types.ts';
 import {
   executePipe,
   getChecks,
@@ -13,7 +19,11 @@ export type SpecialSchema<TInput, TOutput = TInput> = BaseSchema<
   TInput,
   TOutput
 > & {
-  schema: 'special';
+  kind: 'special';
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -54,32 +64,8 @@ export function special<TInput>(
   const [error, pipe] = getDefaultArgs(arg2, arg3);
 
   // Create and return string schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'special',
-
-    /**
-     * Whether it's async.
-     */
-    async: false,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
+  return Object.assign(
+    (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (!check(input)) {
         return getSchemaIssues(
@@ -94,5 +80,10 @@ export function special<TInput>(
       // Execute pipe and return result
       return executePipe(input as TInput, pipe, info, 'special');
     },
-  };
+    {
+      kind: 'special',
+      async: false,
+      checks: getChecks(pipe),
+    } as const
+  );
 }

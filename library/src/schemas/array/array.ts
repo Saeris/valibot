@@ -4,6 +4,7 @@ import type {
   Input,
   Issues,
   Output,
+  ParseInfo,
   Pipe,
   PipeMeta,
 } from '../../types.ts';
@@ -23,8 +24,15 @@ export type ArraySchema<
   TArrayItem extends BaseSchema,
   TOutput = Output<TArrayItem>[]
 > = BaseSchema<Input<TArrayItem>[], TOutput> & {
-  schema: 'array';
+  kind: 'array';
+  /**
+   * The array item schema.
+   */
   array: { item: TArrayItem };
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -65,37 +73,8 @@ export function array<TArrayItem extends BaseSchema>(
   const [error, pipe] = getDefaultArgs(arg2, arg3);
 
   // Create and return array schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'array',
-
-    /**
-     * The array item schema.
-     */
-    array: { item },
-
-    /**
-     * Whether it's async.
-     */
-    async: false,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
+  return Object.assign(
+    (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (!Array.isArray(input)) {
         return getSchemaIssues(
@@ -114,7 +93,7 @@ export function array<TArrayItem extends BaseSchema>(
       // Parse schema of each array item
       for (let key = 0; key < input.length; key++) {
         const value = input[key];
-        const result = item._parse(value, info);
+        const result = item(value, info);
 
         // If there are issues, capture them
         if (result.issues) {
@@ -155,5 +134,11 @@ export function array<TArrayItem extends BaseSchema>(
         ? getIssues(issues)
         : executePipe(output as Output<TArrayItem>[], pipe, info, 'array');
     },
-  };
+    {
+      kind: 'array',
+      async: false,
+      array: { item },
+      checks: getChecks(pipe),
+    } as const
+  );
 }

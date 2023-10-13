@@ -59,7 +59,7 @@ describe('object', () => {
   test('should return issue path', () => {
     const schema1 = object({ key: number() });
     const input1 = { key: '123' };
-    const result1 = schema1._parse(input1);
+    const result1 = schema1(input1);
     expect(result1.issues?.[0].path).toEqual([
       {
         schema: 'object',
@@ -71,7 +71,7 @@ describe('object', () => {
 
     const schema2 = object({ nested: object({ key: string() }) });
     const input2 = { nested: { key: 123 } };
-    const result2 = schema2._parse(input2);
+    const result2 = schema2(input2);
     expect(result2.issues?.[0].path).toEqual([
       {
         schema: 'object',

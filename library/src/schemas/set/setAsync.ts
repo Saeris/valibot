@@ -3,6 +3,7 @@ import type {
   BaseSchemaAsync,
   ErrorMessage,
   Issues,
+  ParseInfoAsync,
   PipeAsync,
   PipeMeta,
 } from '../../types.ts';
@@ -22,8 +23,15 @@ export type SetSchemaAsync<
   TSetValue extends BaseSchema | BaseSchemaAsync,
   TOutput = SetOutput<TSetValue>
 > = BaseSchemaAsync<SetInput<TSetValue>, TOutput> & {
-  schema: 'set';
+  kind: 'set';
+  /**
+   * The set value schema.
+   */
   set: { value: TSetValue };
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -64,37 +72,8 @@ export function setAsync<TSetValue extends BaseSchema | BaseSchemaAsync>(
   const [error, pipe] = getDefaultArgs(arg2, arg3);
 
   // Create and return async set schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'set',
-
-    /**
-     * The set value schema.
-     */
-    set: { value },
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (!(input instanceof Set)) {
         return getSchemaIssues(
@@ -116,7 +95,7 @@ export function setAsync<TSetValue extends BaseSchema | BaseSchemaAsync>(
           // If not aborted early, continue execution
           if (!(info?.abortEarly && issues)) {
             // Get parse result of input value
-            const result = await value._parse(inputValue, info);
+            const result = await value(inputValue, info);
 
             // If not aborted early, continue execution
             if (!(info?.abortEarly && issues)) {
@@ -162,5 +141,11 @@ export function setAsync<TSetValue extends BaseSchema | BaseSchemaAsync>(
         ? getIssues(issues)
         : executePipeAsync(input, pipe, info, 'set');
     },
-  };
+    {
+      kind: 'set',
+      async: true,
+      set: { value },
+      checks: getChecks(pipe),
+    } as const
+  );
 }

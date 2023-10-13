@@ -2,6 +2,7 @@ import type {
   BaseSchema,
   ErrorMessage,
   Issues,
+  ParseInfo,
   Pipe,
   PipeMeta,
 } from '../../types.ts';
@@ -21,8 +22,15 @@ export type SetSchema<
   TSetValue extends BaseSchema,
   TOutput = SetOutput<TSetValue>
 > = BaseSchema<SetInput<TSetValue>, TOutput> & {
-  schema: 'set';
+  kind: 'set';
+  /**
+   * The set value schema.
+   */
   set: { value: TSetValue };
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -63,37 +71,8 @@ export function set<TSetValue extends BaseSchema>(
   const [error, pipe] = getDefaultArgs(arg2, arg3);
 
   // Create and return set schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'set',
-
-    /**
-     * The set value schema.
-     */
-    set: { value },
-
-    /**
-     * Whether it's async.
-     */
-    async: false,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
+  return Object.assign(
+    (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (!(input instanceof Set)) {
         return getSchemaIssues(
@@ -113,7 +92,7 @@ export function set<TSetValue extends BaseSchema>(
       // Parse each value by schema
       for (const inputValue of input) {
         // Get parse result of input value
-        const result = value._parse(inputValue, info);
+        const result = value(inputValue, info);
 
         // If there are issues, capture them
         if (result.issues) {
@@ -157,5 +136,11 @@ export function set<TSetValue extends BaseSchema>(
         ? getIssues(issues)
         : executePipe(output, pipe, info, 'set');
     },
-  };
+    {
+      kind: 'set',
+      async: false,
+      set: { value },
+      checks: getChecks(pipe),
+    } as const
+  );
 }

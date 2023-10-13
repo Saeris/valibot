@@ -1,4 +1,4 @@
-import type { BaseSchema, Issues } from '../../types.ts';
+import type { BaseSchema, Issues, ParseInfo } from '../../types.ts';
 import { getIssues, getOutput, getSchemaIssues } from '../../utils/index.ts';
 import type { IntersectionInput, IntersectionOutput } from './types.ts';
 import { mergeOutputs } from './utils/index.ts';
@@ -19,7 +19,10 @@ export type IntersectionSchema<
   TIntersectionOptions extends IntersectionOptions,
   TOutput = IntersectionOutput<TIntersectionOptions>
 > = BaseSchema<IntersectionInput<TIntersectionOptions>, TOutput> & {
-  schema: 'intersection';
+  kind: 'intersection';
+  /**
+   * The intersection schema.
+   */
   intersection: TIntersectionOptions;
 };
 
@@ -35,38 +38,15 @@ export function intersection<TIntersectionOptions extends IntersectionOptions>(
   intersection: TIntersectionOptions,
   error?: string
 ): IntersectionSchema<TIntersectionOptions> {
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'intersection',
-
-    /**
-     * The intersection schema.
-     */
-    intersection,
-
-    /**
-     * Whether it's async.
-     */
-    async: false,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
+  return Object.assign(
+    (input: unknown, info?: ParseInfo) => {
       // Create issues and outputs
       let issues: Issues | undefined;
       let outputs: [any, ...any] | undefined;
 
       // Parse schema of each option
       for (const schema of intersection) {
-        const result = schema._parse(input, info);
+        const result = schema(input, info);
 
         // If there are issues, capture them
         if (result.issues) {
@@ -123,5 +103,10 @@ export function intersection<TIntersectionOptions extends IntersectionOptions>(
       // Return merged output
       return getOutput(output);
     },
-  };
+    {
+      kind: 'intersection',
+      async: false,
+      intersection,
+    } as const
+  );
 }

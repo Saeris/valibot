@@ -3,6 +3,7 @@ import type {
   BaseSchemaAsync,
   ErrorMessage,
   Issues,
+  ParseInfoAsync,
   PipeAsync,
   PipeMeta,
 } from '../../types.ts';
@@ -31,8 +32,15 @@ export type TupleSchemaAsync<
   TTupleRest extends BaseSchema | BaseSchemaAsync | undefined = undefined,
   TOutput = TupleOutput<TTupleItems, TTupleRest>
 > = BaseSchemaAsync<TupleInput<TTupleItems, TTupleRest>, TOutput> & {
-  schema: 'tuple';
+  kind: 'tuple';
+  /**
+   * The tuple items and rest schema.
+   */
   tuple: { items: TTupleItems; rest: TTupleRest };
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -121,37 +129,8 @@ export function tupleAsync<
   >(arg2, arg3, arg4);
 
   // Create and return async tuple schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'tuple',
-
-    /**
-     * The tuple items and rest schema.
-     */
-    tuple: { items, rest },
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (
         !Array.isArray(input) ||
@@ -178,7 +157,7 @@ export function tupleAsync<
             // If not aborted early, continue execution
             if (!(info?.abortEarly && issues)) {
               const value = input[key];
-              const result = await schema._parse(value, info);
+              const result = await schema(value, info);
 
               // If not aborted early, continue execution
               if (!(info?.abortEarly && issues)) {
@@ -226,7 +205,7 @@ export function tupleAsync<
               // If not aborted early, continue execution
               if (!(info?.abortEarly && issues)) {
                 const key = items.length + index;
-                const result = await rest._parse(value, info);
+                const result = await rest(value, info);
 
                 // If not aborted early, continue execution
                 if (!(info?.abortEarly && issues)) {
@@ -278,5 +257,11 @@ export function tupleAsync<
             'tuple'
           );
     },
-  };
+    {
+      kind: 'tuple',
+      async: true,
+      tuple: { items, rest },
+      checks: getChecks(pipe),
+    } as const
+  );
 }

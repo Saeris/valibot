@@ -2,6 +2,7 @@ import type {
   BaseSchema,
   ErrorMessage,
   Issues,
+  ParseInfo,
   Pipe,
   PipeMeta,
 } from '../../types.ts';
@@ -36,8 +37,15 @@ export type RecordSchema<
   TRecordValue extends BaseSchema,
   TOutput = RecordOutput<TRecordKey, TRecordValue>
 > = BaseSchema<RecordInput<TRecordKey, TRecordValue>, TOutput> & {
-  schema: 'record';
+  kind: 'record';
+  /**
+   * The record key and value schema.
+   */
   record: { key: TRecordKey; value: TRecordValue };
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -127,37 +135,8 @@ export function record<
   >(arg1, arg2, arg3, arg4);
 
   // Create and return record schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'record',
-
-    /**
-     * The record key and value schema.
-     */
-    record: { key, value },
-
-    /**
-     * Whether it's async.
-     */
-    async: false,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
+  return Object.assign(
+    (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (!input || typeof input !== 'object') {
         return getSchemaIssues(
@@ -182,7 +161,7 @@ export function record<
           let pathItem: RecordPathItem | undefined;
 
           // Get parse result of key
-          const keyResult = key._parse(inputKey, {
+          const keyResult = key(inputKey, {
             origin: 'key',
             abortEarly: info?.abortEarly,
             abortPipeEarly: info?.abortPipeEarly,
@@ -215,7 +194,7 @@ export function record<
           }
 
           // Get parse result of value
-          const valueResult = value._parse(inputValue, info);
+          const valueResult = value(inputValue, info);
 
           // If there are issues, capture them
           if (valueResult.issues) {
@@ -263,5 +242,11 @@ export function record<
             'record'
           );
     },
-  };
+    {
+      kind: 'record',
+      async: false,
+      record: { key, value },
+      checks: getChecks(pipe),
+    } as const
+  );
 }

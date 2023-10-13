@@ -1,6 +1,7 @@
 import type {
   BaseSchemaAsync,
   ErrorMessage,
+  ParseInfoAsync,
   PipeAsync,
   PipeMeta,
 } from '../../types.ts';
@@ -19,8 +20,15 @@ export type InstanceSchemaAsync<
   TClass extends Class,
   TOutput = InstanceType<TClass>
 > = BaseSchemaAsync<InstanceType<TClass>, TOutput> & {
-  schema: 'instance';
+  kind: 'instance';
+  /**
+   * The class of the instance.
+   */
   class: TClass;
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -61,37 +69,8 @@ export function instanceAsync<TClass extends Class>(
   const [error, pipe] = getDefaultArgs(arg2, arg3);
 
   // Create and return string schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'instance',
-
-    /**
-     * The class of the instance.
-     */
-    class: of,
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (!(input instanceof of)) {
         return getSchemaIssues(
@@ -106,5 +85,11 @@ export function instanceAsync<TClass extends Class>(
       // Execute pipe and return result
       return executePipeAsync(input, pipe, info, 'instance');
     },
-  };
+    {
+      kind: 'instance',
+      async: true,
+      class: of,
+      checks: getChecks(pipe),
+    } as const
+  );
 }

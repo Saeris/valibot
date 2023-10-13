@@ -77,7 +77,7 @@ describe('tuple', () => {
   test('should return issue path', () => {
     const schema1 = tuple([number(), string(), number()]);
     const input1 = [1, 2, 3];
-    const result1 = schema1._parse(input1);
+    const result1 = schema1(input1);
     expect(result1.issues?.[0].path).toEqual([
       {
         schema: 'tuple',
@@ -89,7 +89,7 @@ describe('tuple', () => {
 
     const schema2 = tuple([number(), object({ key: string() })]);
     const input2 = [123, { key: 123 }] as const;
-    const result2 = schema2._parse(input2);
+    const result2 = schema2(input2);
     expect(result2.issues?.[0].path).toEqual([
       {
         schema: 'tuple',
@@ -107,7 +107,7 @@ describe('tuple', () => {
 
     const schema3 = tuple([number(), number()], string());
     const input3 = [1, 2, 'test', 123, 'abc'];
-    const result3 = schema3._parse(input3);
+    const result3 = schema3(input3);
     expect(result3.issues?.[0].path).toEqual([
       {
         schema: 'tuple',
@@ -119,7 +119,7 @@ describe('tuple', () => {
 
     const schema4 = tuple([number(), number()], object({ key: string() }));
     const input4 = [1, 2, { key: 123 }] as const;
-    const result4 = schema4._parse(input4);
+    const result4 = schema4(input4);
     expect(result4.issues?.[0].path).toEqual([
       {
         schema: 'tuple',

@@ -5,7 +5,7 @@ import type {
   Pipe,
   PipeAsync,
 } from '../../../../types.ts';
-import { getDefaultArgs } from '../../../../utils/index.ts';
+import { getDefaultArgs, isBaseSchema } from '../../../../utils/index.ts';
 import { string } from '../../../string/index.ts';
 import type { RecordKey } from '../../record.ts';
 import type { RecordKeyAsync } from '../../recordAsync.ts';
@@ -30,7 +30,7 @@ export function getRecordArgs<
   arg3: TPipe | ErrorMessage | undefined,
   arg4: TPipe | undefined
 ): [TRecordKey, TRecordValue, ErrorMessage | undefined, TPipe | undefined] {
-  if (typeof arg2 === 'object' && !Array.isArray(arg2)) {
+  if (isBaseSchema(arg2)) {
     const [error, pipe] = getDefaultArgs(arg3, arg4);
     return [arg1 as TRecordKey, arg2, error, pipe];
   }

@@ -1,5 +1,5 @@
 import type { ObjectSchema } from '../../schemas/object/index.ts';
-import type { ErrorMessage } from '../../types.ts';
+import type { ErrorMessage, ParseInfo } from '../../types.ts';
 import { getSchemaIssues } from '../../utils/index.ts';
 
 /**
@@ -15,29 +15,17 @@ export function strict<TSchema extends ObjectSchema<any>>(
   schema: TSchema,
   error?: ErrorMessage
 ): TSchema {
-  return {
-    ...schema,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
-      const result = schema._parse(input, info);
-      return !result.issues &&
-        Object.keys(input as object).some((key) => !(key in schema.object))
-        ? getSchemaIssues(
-            info,
-            'object',
-            'strict',
-            error || 'Invalid keys',
-            input
-          )
-        : result;
-    },
-  };
+  return Object.assign((input: unknown, info?: ParseInfo) => {
+    const result = schema(input, info);
+    return !result.issues &&
+      Object.keys(input as object).some((key) => !(key in schema.object))
+      ? getSchemaIssues(
+          info,
+          'object',
+          'strict',
+          error || 'Invalid keys',
+          input
+        )
+      : result;
+  }, schema);
 }

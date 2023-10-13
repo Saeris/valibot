@@ -1,11 +1,11 @@
-import type { BaseSchema, ErrorMessage } from '../../types.ts';
+import type { BaseSchema, ErrorMessage, ParseInfo } from '../../types.ts';
 import { getSchemaIssues, getOutput } from '../../utils/index.ts';
 
 /**
  * Null schema type.
  */
 export type NullSchema<TOutput = null> = BaseSchema<null, TOutput> & {
-  schema: 'null';
+  kind: 'null';
 };
 
 /**
@@ -16,26 +16,8 @@ export type NullSchema<TOutput = null> = BaseSchema<null, TOutput> & {
  * @returns A null schema.
  */
 export function nullType(error?: ErrorMessage): NullSchema {
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'null',
-
-    /**
-     * Whether it's async.
-     */
-    async: false,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
+  return Object.assign(
+    (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (input !== null) {
         return getSchemaIssues(
@@ -50,5 +32,9 @@ export function nullType(error?: ErrorMessage): NullSchema {
       // Return input as output
       return getOutput(input);
     },
-  };
+    {
+      kind: 'null',
+      async: false,
+    } as const
+  );
 }

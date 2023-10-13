@@ -5,6 +5,7 @@ import type {
   Input,
   Issues,
   Output,
+  ParseInfoAsync,
   PipeAsync,
   PipeMeta,
 } from '../../types.ts';
@@ -24,8 +25,15 @@ export type ArraySchemaAsync<
   TArrayItem extends BaseSchema | BaseSchemaAsync,
   TOutput = Output<TArrayItem>[]
 > = BaseSchemaAsync<Input<TArrayItem>[], TOutput> & {
-  schema: 'array';
+  kind: 'array';
+  /**
+   * The array item schema.
+   */
   array: { item: TArrayItem };
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -66,37 +74,8 @@ export function arrayAsync<TArrayItem extends BaseSchema | BaseSchemaAsync>(
   const [error, pipe] = getDefaultArgs(arg2, arg3);
 
   // Create and return async array schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'array',
-
-    /**
-     * The array item schema.
-     */
-    array: { item },
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe ?? []),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (!Array.isArray(input)) {
         return getSchemaIssues(
@@ -118,7 +97,7 @@ export function arrayAsync<TArrayItem extends BaseSchema | BaseSchemaAsync>(
           // If not aborted early, continue execution
           if (!(info?.abortEarly && issues)) {
             // Parse schema of array item
-            const result = await item._parse(value, info);
+            const result = await item(value, info);
 
             // If not aborted early, continue execution
             if (!(info?.abortEarly && issues)) {
@@ -164,5 +143,11 @@ export function arrayAsync<TArrayItem extends BaseSchema | BaseSchemaAsync>(
         ? getIssues(issues)
         : executePipeAsync(output as Output<TArrayItem>[], pipe, info, 'array');
     },
-  };
+    {
+      kind: 'array',
+      async: true,
+      array: { item },
+      checks: getChecks(pipe ?? []),
+    } as const
+  );
 }

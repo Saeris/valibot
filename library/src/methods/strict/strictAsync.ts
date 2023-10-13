@@ -1,5 +1,5 @@
 import type { ObjectSchemaAsync } from '../../schemas/object/index.ts';
-import type { ErrorMessage } from '../../types.ts';
+import type { ErrorMessage, ParseInfoAsync } from '../../types.ts';
 import { getSchemaIssues } from '../../utils/index.ts';
 
 /**
@@ -15,29 +15,17 @@ export function strictAsync<TSchema extends ObjectSchemaAsync<any>>(
   schema: TSchema,
   error?: ErrorMessage
 ): TSchema {
-  return {
-    ...schema,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
-      const result = await schema._parse(input, info);
-      return !result.issues &&
-        Object.keys(input as object).some((key) => !(key in schema.object))
-        ? getSchemaIssues(
-            info,
-            'object',
-            'strict',
-            error || 'Invalid keys',
-            input
-          )
-        : result;
-    },
-  };
+  return Object.assign(async (input: unknown, info?: ParseInfoAsync) => {
+    const result = await schema(input, info);
+    return !result.issues &&
+      Object.keys(input as object).some((key) => !(key in schema.object))
+      ? getSchemaIssues(
+          info,
+          'object',
+          'strict',
+          error || 'Invalid keys',
+          input
+        )
+      : result;
+  }, schema);
 }

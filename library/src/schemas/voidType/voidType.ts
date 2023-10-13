@@ -1,11 +1,11 @@
-import type { BaseSchema, ErrorMessage } from '../../types.ts';
+import type { BaseSchema, ErrorMessage, ParseInfo } from '../../types.ts';
 import { getSchemaIssues, getOutput } from '../../utils/index.ts';
 
 /**
  * Void schema type.
  */
 export type VoidSchema<TOutput = void> = BaseSchema<void, TOutput> & {
-  schema: 'void';
+  kind: 'void';
 };
 
 /**
@@ -16,27 +16,8 @@ export type VoidSchema<TOutput = void> = BaseSchema<void, TOutput> & {
  * @returns A void schema.
  */
 export function voidType(error?: ErrorMessage): VoidSchema {
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'void',
-
-    /**
-     * Whether it's async.
-     */
-    async: false,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
-      // Check type of input
+  return Object.assign(
+    (input: unknown, info?: ParseInfo) => {
       if (typeof input !== 'undefined') {
         return getSchemaIssues(
           info,
@@ -47,8 +28,11 @@ export function voidType(error?: ErrorMessage): VoidSchema {
         );
       }
 
-      // Return input as output
       return getOutput(input);
     },
-  };
+    {
+      kind: 'void',
+      async: false,
+    } as const
+  );
 }

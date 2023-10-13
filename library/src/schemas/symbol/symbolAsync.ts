@@ -1,4 +1,8 @@
-import type { BaseSchemaAsync, ErrorMessage } from '../../types.ts';
+import type {
+  BaseSchemaAsync,
+  ErrorMessage,
+  ParseInfoAsync,
+} from '../../types.ts';
 import { getSchemaIssues, getOutput } from '../../utils/index.ts';
 
 /**
@@ -8,7 +12,7 @@ export type SymbolSchemaAsync<TOutput = symbol> = BaseSchemaAsync<
   symbol,
   TOutput
 > & {
-  schema: 'symbol';
+  kind: 'symbol';
 };
 
 /**
@@ -19,26 +23,8 @@ export type SymbolSchemaAsync<TOutput = symbol> = BaseSchemaAsync<
  * @returns An async symbol schema.
  */
 export function symbolAsync(error?: ErrorMessage): SymbolSchemaAsync {
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'symbol',
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (typeof input !== 'symbol') {
         return getSchemaIssues(
@@ -53,5 +39,9 @@ export function symbolAsync(error?: ErrorMessage): SymbolSchemaAsync {
       // Return input as output
       return getOutput(input);
     },
-  };
+    {
+      kind: 'symbol',
+      async: true,
+    } as const
+  );
 }

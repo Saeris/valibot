@@ -1,4 +1,9 @@
-import type { BaseSchemaAsync, PipeAsync, PipeMeta } from '../../types.ts';
+import type {
+  BaseSchemaAsync,
+  ParseInfoAsync,
+  PipeAsync,
+  PipeMeta,
+} from '../../types.ts';
 import { getChecks } from '../../utils/getChecks/getChecks.ts';
 import { executePipeAsync } from '../../utils/index.ts';
 
@@ -9,7 +14,11 @@ export type UnknownSchemaAsync<TOutput = unknown> = BaseSchemaAsync<
   unknown,
   TOutput
 > & {
-  schema: 'unknown';
+  kind: 'unknown';
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -23,33 +32,14 @@ export type UnknownSchemaAsync<TOutput = unknown> = BaseSchemaAsync<
 export function unknownAsync(
   pipe: PipeAsync<unknown> = []
 ): UnknownSchemaAsync {
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'unknown',
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
       return executePipeAsync(input, pipe, info, 'unknown');
     },
-  };
+    {
+      kind: 'unknown',
+      async: true,
+      checks: getChecks(pipe),
+    } as const
+  );
 }

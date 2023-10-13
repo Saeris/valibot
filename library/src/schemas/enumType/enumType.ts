@@ -1,4 +1,4 @@
-import type { BaseSchema, ErrorMessage } from '../../types.ts';
+import type { BaseSchema, ErrorMessage, ParseInfo } from '../../types.ts';
 import { getSchemaIssues, getOutput } from '../../utils/index.ts';
 import type { Enum } from './types.ts';
 
@@ -9,7 +9,10 @@ export type EnumSchema<
   TEnum extends Enum,
   TOutput = TEnum[number]
 > = BaseSchema<TEnum[number], TOutput> & {
-  schema: 'enum';
+  kind: 'enum';
+  /**
+   * The enum value.
+   */
   enum: TEnum;
 };
 
@@ -25,31 +28,8 @@ export function enumType<TOption extends string, TEnum extends Enum<TOption>>(
   enumValue: TEnum,
   error?: ErrorMessage
 ): EnumSchema<TEnum> {
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'enum',
-
-    /**
-     * The enum value.
-     */
-    enum: enumValue,
-
-    /**
-     * Whether it's async.
-     */
-    async: false,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
+  return Object.assign(
+    (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (!enumValue.includes(input as any)) {
         return getSchemaIssues(
@@ -64,5 +44,10 @@ export function enumType<TOption extends string, TEnum extends Enum<TOption>>(
       // Return inpot as output
       return getOutput(input as TEnum[number]);
     },
-  };
+    {
+      kind: 'enum',
+      async: false,
+      enum: enumValue,
+    } as const
+  );
 }

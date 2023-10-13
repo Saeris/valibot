@@ -1,4 +1,8 @@
-import type { BaseSchemaAsync, ErrorMessage } from '../../types.ts';
+import type {
+  BaseSchemaAsync,
+  ErrorMessage,
+  ParseInfoAsync,
+} from '../../types.ts';
 import { getSchemaIssues, getOutput } from '../../utils/index.ts';
 import type { Literal } from './types.ts';
 
@@ -9,7 +13,10 @@ export type LiteralSchemaAsync<
   TLiteral extends Literal,
   TOutput = TLiteral
 > = BaseSchemaAsync<TLiteral, TOutput> & {
-  schema: 'literal';
+  kind: 'literal';
+  /**
+   * The literal value.
+   */
   literal: TLiteral;
 };
 
@@ -25,31 +32,8 @@ export function literalAsync<TLiteral extends Literal>(
   literal: TLiteral,
   error?: ErrorMessage
 ): LiteralSchemaAsync<TLiteral> {
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'literal',
-
-    /**
-     * The literal value.
-     */
-    literal,
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (input !== literal) {
         return getSchemaIssues(
@@ -64,5 +48,10 @@ export function literalAsync<TLiteral extends Literal>(
       // Return input as output
       return getOutput(input as TLiteral);
     },
-  };
+    {
+      kind: 'literal',
+      async: true,
+      literal,
+    } as const
+  );
 }

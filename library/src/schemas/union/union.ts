@@ -4,6 +4,7 @@ import type {
   Input,
   Issues,
   Output,
+  ParseInfo,
 } from '../../types.ts';
 import { getSchemaIssues, getOutput } from '../../utils/index.ts';
 
@@ -23,7 +24,10 @@ export type UnionSchema<
   TUnionOptions extends UnionOptions,
   TOutput = Output<TUnionOptions[number]>
 > = BaseSchema<Input<TUnionOptions[number]>, TOutput> & {
-  schema: 'union';
+  kind: 'union';
+  /**
+   * The union schema.
+   */
   union: TUnionOptions;
 };
 
@@ -39,38 +43,15 @@ export function union<TUnionOptions extends UnionOptions>(
   union: TUnionOptions,
   error?: ErrorMessage
 ): UnionSchema<TUnionOptions> {
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'union',
-
-    /**
-     * The union schema.
-     */
-    union,
-
-    /**
-     * Whether it's async.
-     */
-    async: false,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
+  return Object.assign(
+    (input: unknown, info?: ParseInfo) => {
       // Create issues and output
       let issues: Issues | undefined;
       let output: [Output<TUnionOptions[number]>] | undefined;
 
       // Parse schema of each option
       for (const schema of union) {
-        const result = schema._parse(input, info);
+        const result = schema(input, info);
 
         // If there are issues, capture them
         if (result.issues) {
@@ -103,5 +84,10 @@ export function union<TUnionOptions extends UnionOptions>(
             issues
           );
     },
-  };
+    {
+      kind: 'union',
+      async: false,
+      union,
+    } as const
+  );
 }

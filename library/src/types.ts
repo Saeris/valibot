@@ -66,6 +66,16 @@ export type ParseInfo = Partial<
 >;
 
 /**
+ * Parse info type.
+ */
+export type ParseInfoAsync = Partial<
+  Pick<
+    Issue,
+    'origin' | 'abortEarly' | 'abortPipeEarly' | 'skipPipe' | 'reason'
+  >
+>;
+
+/**
  * Path item type.
  */
 export type PathItem =
@@ -86,18 +96,36 @@ export type _ParseResult<TOutput> =
 /**
  * Base schema type.
  */
-export type BaseSchema<TInput = any, TOutput = TInput> = {
+export type BaseSchema<TInput = any, TOutput = TInput> = ((
+  input: unknown,
+  info?: ParseInfo
+) => _ParseResult<TOutput>) & {
+  /**
+   * The schema kind.
+   */
+  kind: string;
+  /**
+   * Whether it's async.
+   */
   async: false;
-  _parse(input: unknown, info?: ParseInfo): _ParseResult<TOutput>;
   _types?: { input: TInput; output: TOutput };
 };
 
 /**
  * Base schema async type.
  */
-export type BaseSchemaAsync<TInput = any, TOutput = TInput> = {
+export type BaseSchemaAsync<TInput = any, TOutput = TInput> = ((
+  input: unknown,
+  info?: ParseInfoAsync
+) => Promise<_ParseResult<TOutput>>) & {
+  /**
+   * The schema kind.
+   */
+  kind: string;
+  /**
+   * Whether it's async.
+   */
   async: true;
-  _parse(input: unknown, info?: ParseInfo): Promise<_ParseResult<TOutput>>;
   _types?: { input: TInput; output: TOutput };
 };
 

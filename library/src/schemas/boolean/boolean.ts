@@ -1,4 +1,10 @@
-import type { BaseSchema, ErrorMessage, Pipe, PipeMeta } from '../../types.ts';
+import type {
+  BaseSchema,
+  ErrorMessage,
+  ParseInfo,
+  Pipe,
+  PipeMeta,
+} from '../../types.ts';
 import { getChecks } from '../../utils/getChecks/getChecks.ts';
 import {
   executePipe,
@@ -10,7 +16,11 @@ import {
  * Boolean schema type.
  */
 export type BooleanSchema<TOutput = boolean> = BaseSchema<boolean, TOutput> & {
-  schema: 'boolean';
+  kind: 'boolean';
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -44,32 +54,8 @@ export function boolean(
   const [error, pipe] = getDefaultArgs(arg1, arg2);
 
   // Create and return boolean schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'boolean',
-
-    /**
-     * Whether it's async.
-     */
-    async: false,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
+  return Object.assign(
+    (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (typeof input !== 'boolean') {
         return getSchemaIssues(
@@ -84,5 +70,10 @@ export function boolean(
       // Execute pipe and return result
       return executePipe(input, pipe, info, 'boolean');
     },
-  };
+    {
+      kind: 'boolean',
+      async: false,
+      checks: getChecks(pipe),
+    } as const
+  );
 }

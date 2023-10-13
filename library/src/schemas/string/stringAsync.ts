@@ -1,6 +1,7 @@
 import type {
   BaseSchemaAsync,
   ErrorMessage,
+  ParseInfoAsync,
   PipeAsync,
   PipeMeta,
 } from '../../types.ts';
@@ -18,7 +19,11 @@ export type StringSchemaAsync<TOutput = string> = BaseSchemaAsync<
   string,
   TOutput
 > & {
-  schema: 'string';
+  kind: 'string';
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -52,32 +57,8 @@ export function stringAsync(
   const [error, pipe] = getDefaultArgs(arg1, arg2);
 
   // Create and return async string schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'string',
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (typeof input !== 'string') {
         return getSchemaIssues(
@@ -92,5 +73,10 @@ export function stringAsync(
       // Execute pipe and return result
       return executePipeAsync(input, pipe, info, 'string');
     },
-  };
+    {
+      kind: 'string',
+      async: true,
+      checks: getChecks(pipe),
+    } as const
+  );
 }

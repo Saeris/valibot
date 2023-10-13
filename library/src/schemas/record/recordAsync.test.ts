@@ -86,7 +86,7 @@ describe('recordAsync', () => {
   test('should return issue path', async () => {
     const schema1 = recordAsync(number());
     const input1 = { a: 1, b: '2', c: 3 };
-    const result1 = await schema1._parse(input1);
+    const result1 = await schema1(input1);
     expect(result1.issues?.[0].path).toEqual([
       {
         schema: 'record',
@@ -98,7 +98,7 @@ describe('recordAsync', () => {
 
     const schema2 = recordAsync(object({ key: string() }));
     const input2 = { a: { key: 'test' }, b: { key: 123 } };
-    const result2 = await schema2._parse(input2);
+    const result2 = await schema2(input2);
     expect(result2.issues?.[0].origin).toBe('value');
     expect(result2.issues?.[0].path).toEqual([
       {
@@ -117,7 +117,7 @@ describe('recordAsync', () => {
 
     const schema3 = recordAsync(string([maxLength(1)]), number());
     const input3 = { a: 1, bb: 2, c: 3 };
-    const result3 = await schema3._parse(input3);
+    const result3 = await schema3(input3);
     expect(result3.issues?.[0].origin).toBe('key');
     expect(result3.issues?.[0].path).toEqual([
       {

@@ -67,7 +67,7 @@ describe('setAsync', () => {
   test('should return issue path', async () => {
     const schema1 = setAsync(number());
     const input1 = new Set().add(1).add('2').add(3);
-    const result1 = await schema1._parse(input1);
+    const result1 = await schema1(input1);
     expect(result1.issues?.[0].path).toEqual([
       {
         schema: 'set',
@@ -79,7 +79,7 @@ describe('setAsync', () => {
 
     const schema2 = setAsync(object({ key: string() }));
     const input2 = new Set().add({ key: 'hello' }).add({ key: 123 });
-    const result2 = await schema2._parse(input2);
+    const result2 = await schema2(input2);
     expect(result2.issues?.[0].path).toEqual([
       {
         schema: 'set',

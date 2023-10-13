@@ -1,4 +1,10 @@
-import type { BaseSchema, ErrorMessage, Pipe, PipeMeta } from '../../types.ts';
+import type {
+  BaseSchema,
+  ErrorMessage,
+  ParseInfo,
+  Pipe,
+  PipeMeta,
+} from '../../types.ts';
 import { getChecks } from '../../utils/getChecks/getChecks.ts';
 import {
   executePipe,
@@ -10,7 +16,11 @@ import {
  * Number schema type.
  */
 export type NumberSchema<TOutput = number> = BaseSchema<number, TOutput> & {
-  schema: 'number';
+  kind: 'number';
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -41,32 +51,8 @@ export function number(
   const [error, pipe] = getDefaultArgs(arg1, arg2);
 
   // Create and return number schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'number',
-
-    /**
-     * Whether it's async.
-     */
-    async: false,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
+  return Object.assign(
+    (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (typeof input !== 'number' || Number.isNaN(input)) {
         return getSchemaIssues(
@@ -81,5 +67,10 @@ export function number(
       // Execute pipe and return result
       return executePipe(input, pipe, info, 'number');
     },
-  };
+    {
+      kind: 'number',
+      async: false,
+      checks: getChecks(pipe),
+    } as const
+  );
 }

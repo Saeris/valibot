@@ -1,4 +1,8 @@
-import type { BaseSchemaAsync, ErrorMessage } from '../../types.ts';
+import type {
+  BaseSchemaAsync,
+  ErrorMessage,
+  ParseInfoAsync,
+} from '../../types.ts';
 import { getSchemaIssues, getOutput } from '../../utils/index.ts';
 import type { NativeEnum } from './nativeEnum.ts';
 
@@ -9,7 +13,10 @@ export type NativeEnumSchemaAsync<
   TNativeEnum extends NativeEnum,
   TOutput = TNativeEnum[keyof TNativeEnum]
 > = BaseSchemaAsync<TNativeEnum[keyof TNativeEnum], TOutput> & {
-  schema: 'native_enum';
+  kind: 'native_enum';
+  /**
+   * The native enum value.
+   */
   nativeEnum: TNativeEnum;
 };
 
@@ -25,31 +32,8 @@ export function nativeEnumAsync<TNativeEnum extends NativeEnum>(
   nativeEnum: TNativeEnum,
   error?: ErrorMessage
 ): NativeEnumSchemaAsync<TNativeEnum> {
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'native_enum',
-
-    /**
-     * The native enum value.
-     */
-    nativeEnum,
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (!Object.values(nativeEnum).includes(input as any)) {
         return getSchemaIssues(
@@ -64,5 +48,10 @@ export function nativeEnumAsync<TNativeEnum extends NativeEnum>(
       // Return input as output
       return getOutput(input as TNativeEnum[keyof TNativeEnum]);
     },
-  };
+    {
+      kind: 'native_enum',
+      async: true,
+      nativeEnum,
+    } as const
+  );
 }

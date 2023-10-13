@@ -2,6 +2,7 @@ import type {
   BaseSchema,
   ErrorMessage,
   Issues,
+  ParseInfo,
   Pipe,
   PipeMeta,
 } from '../../types.ts';
@@ -26,8 +27,15 @@ export type ObjectSchema<
   TObjectShape extends ObjectShape,
   TOutput = ObjectOutput<TObjectShape>
 > = BaseSchema<ObjectInput<TObjectShape>, TOutput> & {
-  schema: 'object';
+  kind: 'object';
+  /**
+   * The object schema.
+   */
   object: TObjectShape;
+  /**
+   * Validation checks that will be applied to
+   * the Object.
+   */
   checks: PipeMeta[];
 };
 
@@ -71,37 +79,8 @@ export function object<TObjectShape extends ObjectShape>(
   let cachedEntries: [string, BaseSchema<any>][];
 
   // Create and return object schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'object',
-
-    /**
-     * The object schema.
-     */
-    object,
-
-    /**
-     * Whether it's async.
-     */
-    async: false,
-
-    /**
-     * Validation checks that will be applied to
-     * the Object.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
+  return Object.assign(
+    (input: unknown, info?: ParseInfo) => {
       // Check type of input
       if (!input || typeof input !== 'object') {
         return getSchemaIssues(
@@ -126,7 +105,7 @@ export function object<TObjectShape extends ObjectShape>(
         const value = (input as Record<string, unknown>)[key];
 
         // Get parse result of value
-        const result = schema._parse(value, info);
+        const result = schema(value, info);
 
         // If there are issues, capture them
         if (result.issues) {
@@ -172,5 +151,11 @@ export function object<TObjectShape extends ObjectShape>(
             'object'
           );
     },
-  };
+    {
+      kind: 'object',
+      async: false,
+      object,
+      checks: getChecks(pipe),
+    } as const
+  );
 }

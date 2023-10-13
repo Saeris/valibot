@@ -59,7 +59,7 @@ describe('objectAsync', () => {
   test('should return issue path', async () => {
     const schema1 = objectAsync({ key: number() });
     const input1 = { key: '123' };
-    const result1 = await schema1._parse(input1);
+    const result1 = await schema1(input1);
     expect(result1.issues?.[0].path).toEqual([
       {
         schema: 'object',
@@ -71,7 +71,7 @@ describe('objectAsync', () => {
 
     const schema2 = objectAsync({ nested: objectAsync({ key: string() }) });
     const input2 = { nested: { key: 123 } };
-    const result2 = await schema2._parse(input2);
+    const result2 = await schema2(input2);
     expect(result2.issues?.[0].path).toEqual([
       {
         schema: 'object',

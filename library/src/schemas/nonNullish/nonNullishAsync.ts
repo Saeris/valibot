@@ -4,6 +4,7 @@ import type {
   ErrorMessage,
   Input,
   Output,
+  ParseInfoAsync,
 } from '../../types.ts';
 import { getSchemaIssues } from '../../utils/index.ts';
 import type { NonNullish } from './nonNullish.ts';
@@ -15,7 +16,10 @@ export type NonNullishSchemaAsync<
   TWrapped extends BaseSchema | BaseSchemaAsync,
   TOutput = NonNullish<Output<TWrapped>>
 > = BaseSchemaAsync<NonNullish<Input<TWrapped>>, TOutput> & {
-  schema: 'non_nullish';
+  kind: 'non_nullish';
+  /**
+   * The wrapped schema.
+   */
   wrapped: TWrapped;
 };
 
@@ -31,32 +35,9 @@ export function nonNullishAsync<TWrapped extends BaseSchema | BaseSchemaAsync>(
   wrapped: TWrapped,
   error?: ErrorMessage
 ): NonNullishSchemaAsync<TWrapped> {
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'non_nullish',
-
-    /**
-     * The wrapped schema.
-     */
-    wrapped,
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
-      // Allow `null` and `undefined` values not to pass
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
+      // Prevent `null` and `undefined` values from passing
       if (input === null || input === undefined) {
         return getSchemaIssues(
           info,
@@ -68,7 +49,12 @@ export function nonNullishAsync<TWrapped extends BaseSchema | BaseSchemaAsync>(
       }
 
       // Return result of wrapped schema
-      return wrapped._parse(input, info);
+      return wrapped(input, info);
     },
-  };
+    {
+      kind: 'non_nullish',
+      async: true,
+      wrapped,
+    } as const
+  );
 }

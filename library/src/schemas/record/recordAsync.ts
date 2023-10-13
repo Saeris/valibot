@@ -3,6 +3,7 @@ import type {
   BaseSchemaAsync,
   ErrorMessage,
   Issues,
+  ParseInfoAsync,
   PipeAsync,
   PipeMeta,
 } from '../../types.ts';
@@ -44,8 +45,15 @@ export type RecordSchemaAsync<
   TRecordValue extends BaseSchema | BaseSchemaAsync,
   TOutput = RecordOutput<TRecordKey, TRecordValue>
 > = BaseSchemaAsync<RecordInput<TRecordKey, TRecordValue>, TOutput> & {
-  schema: 'record';
+  kind: 'record';
+  /**
+   * The record key and value schema.
+   */
   record: { key: TRecordKey; value: TRecordValue };
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -135,37 +143,8 @@ export function recordAsync<
   >(arg1, arg2, arg3, arg4);
 
   // Create and return async record schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'record',
-
-    /**
-     * The record key and value schema.
-     */
-    record: { key, value },
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (!input || typeof input !== 'object') {
         return getSchemaIssues(
@@ -201,7 +180,7 @@ export function recordAsync<
                 // If not aborted early, continue execution
                 if (!(info?.abortEarly && issues)) {
                   // Get parse result of value
-                  const result = await schema._parse(value, {
+                  const result = await schema(value, {
                     origin,
                     abortEarly: info?.abortEarly,
                     abortPipeEarly: info?.abortPipeEarly,
@@ -265,5 +244,11 @@ export function recordAsync<
             'record'
           );
     },
-  };
+    {
+      kind: 'record',
+      async: true,
+      record: { key, value },
+      checks: getChecks(pipe),
+    } as const
+  );
 }

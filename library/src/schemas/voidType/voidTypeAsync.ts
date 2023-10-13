@@ -1,11 +1,15 @@
-import type { BaseSchemaAsync, ErrorMessage } from '../../types.ts';
+import type {
+  BaseSchemaAsync,
+  ErrorMessage,
+  ParseInfoAsync,
+} from '../../types.ts';
 import { getSchemaIssues, getOutput } from '../../utils/index.ts';
 
 /**
  * Void schema async type.
  */
 export type VoidSchemaAsync<TOutput = void> = BaseSchemaAsync<void, TOutput> & {
-  schema: 'void';
+  kind: 'void';
 };
 
 /**
@@ -16,27 +20,8 @@ export type VoidSchemaAsync<TOutput = void> = BaseSchemaAsync<void, TOutput> & {
  * @returns An async void schema.
  */
 export function voidTypeAsync(error?: ErrorMessage): VoidSchemaAsync {
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'void',
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
-      // Check type of input
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
       if (typeof input !== 'undefined') {
         return getSchemaIssues(
           info,
@@ -47,8 +32,11 @@ export function voidTypeAsync(error?: ErrorMessage): VoidSchemaAsync {
         );
       }
 
-      // Return input as output
       return getOutput(input);
     },
-  };
+    {
+      kind: 'void',
+      async: true,
+    } as const
+  );
 }

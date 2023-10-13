@@ -1,6 +1,7 @@
 import type {
   BaseSchemaAsync,
   ErrorMessage,
+  ParseInfoAsync,
   PipeAsync,
   PipeMeta,
 } from '../../types.ts';
@@ -15,7 +16,11 @@ import {
  * Blob schema async type.
  */
 export type BlobSchemaAsync<TOutput = Blob> = BaseSchemaAsync<Blob, TOutput> & {
-  schema: 'blob';
+  kind: 'blob';
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -49,32 +54,8 @@ export function blobAsync(
   const [error, pipe] = getDefaultArgs(arg1, arg2);
 
   // Create and return async blob schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'blob',
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (!(input instanceof Blob)) {
         return getSchemaIssues(
@@ -89,5 +70,10 @@ export function blobAsync(
       // Execute pipe and return result
       return executePipeAsync(input, pipe, info, 'blob');
     },
-  };
+    {
+      kind: 'blob',
+      async: true,
+      checks: getChecks(pipe),
+    } as const
+  );
 }

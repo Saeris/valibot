@@ -1,4 +1,4 @@
-import type { BaseSchema, Output } from '../../types.ts';
+import type { BaseSchema, Output, ParseInfo } from '../../types.ts';
 import { getOutput } from '../../utils/index.ts';
 import type { FallbackInfo } from './types.ts';
 
@@ -14,29 +14,17 @@ export function fallback<TSchema extends BaseSchema>(
   schema: TSchema,
   value: Output<TSchema> | ((info: FallbackInfo) => Output<TSchema>)
 ): TSchema {
-  return {
-    ...schema,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
-      const result = schema._parse(input, info);
-      return getOutput(
-        result.issues
-          ? typeof value === 'function'
-            ? (value as (info: FallbackInfo) => Output<TSchema>)({
-                input,
-                issues: result.issues,
-              })
-            : value
-          : result.output
-      );
-    },
-  };
+  return Object.assign((input: unknown, info?: ParseInfo) => {
+    const result = schema(input, info);
+    return getOutput(
+      result.issues
+        ? typeof value === 'function'
+          ? (value as (info: FallbackInfo) => Output<TSchema>)({
+              input,
+              issues: result.issues,
+            })
+          : value
+        : result.output
+    );
+  }, schema);
 }

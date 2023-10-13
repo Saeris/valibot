@@ -20,7 +20,7 @@ export async function parseAsync<TSchema extends BaseSchema | BaseSchemaAsync>(
   input: unknown,
   info?: Pick<ParseInfo, 'abortEarly' | 'abortPipeEarly' | 'skipPipe'>
 ): Promise<Output<TSchema>> {
-  const result = await schema._parse(input, info);
+  const result = await schema(input, info);
   if (result.issues) {
     throw new ValiError(result.issues);
   }

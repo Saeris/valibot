@@ -18,7 +18,7 @@ export async function safeParseAsync<
   input: unknown,
   info?: Pick<ParseInfo, 'abortEarly' | 'abortPipeEarly' | 'skipPipe'>
 ): Promise<SafeParseResult<TSchema>> {
-  const result = await schema._parse(input, info);
+  const result = await schema(input, info);
   return result.issues
     ? {
         success: false,

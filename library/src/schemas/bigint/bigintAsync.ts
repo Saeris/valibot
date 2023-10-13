@@ -1,6 +1,7 @@
 import type {
   BaseSchemaAsync,
   ErrorMessage,
+  ParseInfoAsync,
   PipeAsync,
   PipeMeta,
 } from '../../types.ts';
@@ -18,7 +19,11 @@ export type BigintSchemaAsync<TOutput = bigint> = BaseSchemaAsync<
   bigint,
   TOutput
 > & {
-  schema: 'bigint';
+  kind: 'bigint';
+  /**
+   * Validation checks that will be run against
+   * the input value.
+   */
   checks: PipeMeta[];
 };
 
@@ -52,32 +57,8 @@ export function bigintAsync(
   const [error, pipe] = getDefaultArgs(arg1, arg2);
 
   // Create and return async bigint schema
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'bigint',
-
-    /**
-     * Whether it's async.
-     */
-    async: true,
-
-    /**
-     * Validation checks that will be run against
-     * the input value.
-     */
-    checks: getChecks(pipe ?? []),
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    async _parse(input, info) {
+  return Object.assign(
+    async (input: unknown, info?: ParseInfoAsync) => {
       // Check type of input
       if (typeof input !== 'bigint') {
         return getSchemaIssues(
@@ -92,5 +73,10 @@ export function bigintAsync(
       // Execute pipe and return result
       return executePipeAsync(input, pipe, info, 'bigint');
     },
-  };
+    {
+      kind: 'bigint',
+      async: true,
+      checks: getChecks(pipe),
+    } as const
+  );
 }

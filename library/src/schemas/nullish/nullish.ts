@@ -1,4 +1,4 @@
-import type { BaseSchema, Input, Output } from '../../types.ts';
+import type { BaseSchema, Input, Output, ParseInfo } from '../../types.ts';
 import { getOutput } from '../../utils/index.ts';
 
 /**
@@ -11,8 +11,14 @@ export type NullishSchema<
     ? Output<TWrapped> | null | undefined
     : Output<TWrapped>
 > = BaseSchema<Input<TWrapped> | null | undefined, TOutput> & {
-  schema: 'nullish';
+  kind: 'nullish';
+  /**
+   * The wrapped schema.
+   */
   wrapped: TWrapped;
+  /**
+   * The default value.
+   */
   get default(): TDefault;
 };
 
@@ -31,45 +37,17 @@ export function nullish<
   wrapped: TWrapped,
   default_?: TDefault | (() => TDefault)
 ): NullishSchema<TWrapped, TDefault> {
-  return {
-    /**
-     * The schema type.
-     */
-    schema: 'nullish',
+  const getDefault = () =>
+    typeof default_ === 'function'
+      ? (default_ as () => TDefault)()
+      : (default_ as TDefault);
 
-    /**
-     * The wrapped schema.
-     */
-    wrapped,
-
-    /**
-     * The default value.
-     */
-    get default() {
-      return typeof default_ === 'function'
-        ? (default_ as () => TDefault)()
-        : (default_ as TDefault);
-    },
-
-    /**
-     * Whether it's async.
-     */
-    async: false,
-
-    /**
-     * Parses unknown input based on its schema.
-     *
-     * @param input The input to be parsed.
-     * @param info The parse info.
-     *
-     * @returns The parsed output.
-     */
-    _parse(input, info) {
-      // Get default or input value
+  return Object.assign(
+    (input: unknown, info?: ParseInfo) => {
       let default_: TDefault;
       const value =
         (input === null || input === undefined) &&
-        (default_ = this.default) &&
+        (default_ = getDefault()) &&
         default_ !== undefined
           ? default_
           : input;
@@ -80,7 +58,15 @@ export function nullish<
       }
 
       // Return result of wrapped schema
-      return wrapped._parse(value, info);
+      return wrapped(value, info);
     },
-  };
+    {
+      kind: 'nullish',
+      async: false,
+      wrapped,
+      get default() {
+        return getDefault();
+      },
+    } as const
+  );
 }

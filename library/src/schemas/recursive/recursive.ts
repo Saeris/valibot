@@ -9,8 +9,8 @@ import {
  * Recursive schema type.
  */
 export class RecursiveSchema<
-  const TSchemaGetter extends () => BaseSchema,
-  const TOutput = Output<ReturnType<TSchemaGetter>>
+  TSchemaGetter extends () => BaseSchema,
+  TOutput = Output<ReturnType<TSchemaGetter>>
 > extends BaseSchema<Input<ReturnType<TSchemaGetter>>, TOutput> {
   /**
    * The schema type.
@@ -38,6 +38,6 @@ export class RecursiveSchema<
  *
  * @returns A recursive schema.
  */
-export const recursive = <const TSchemaGetter extends () => BaseSchema>(
+export const recursive = <TSchemaGetter extends () => BaseSchema>(
   getter: TSchemaGetter
 ) => new RecursiveSchema(getter);

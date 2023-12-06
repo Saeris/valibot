@@ -13,7 +13,7 @@ import {
 /**
  * Bigint schema async type.
  */
-export class BigintSchemaAsync<const TOutput = bigint> extends BaseSchemaAsync<
+export class BigintSchemaAsync<TOutput = bigint> extends BaseSchemaAsync<
   bigint,
   TOutput
 > {

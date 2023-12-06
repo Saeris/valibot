@@ -16,8 +16,8 @@ export type NonNullish<T> = T extends null | undefined ? never : T;
  * Non nullish schema type.
  */
 export class NonNullishSchema<
-  const TWrapped extends BaseSchema,
-  const TOutput = NonNullish<Output<TWrapped>>
+  TWrapped extends BaseSchema,
+  TOutput = NonNullish<Output<TWrapped>>
 > extends BaseSchema<NonNullish<Input<TWrapped>>, TOutput> {
   /**
    * The schema type.
@@ -57,7 +57,7 @@ export class NonNullishSchema<
  *
  * @returns A non nullish schema.
  */
-export const nonNullish = <const TWrapped extends BaseSchema>(
+export const nonNullish = <TWrapped extends BaseSchema>(
   wrapped: TWrapped,
   message?: ErrorMessage
 ) => new NonNullishSchema(wrapped, message);

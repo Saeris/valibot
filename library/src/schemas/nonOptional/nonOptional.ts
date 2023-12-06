@@ -16,8 +16,8 @@ export type NonOptional<T> = T extends undefined ? never : T;
  * Non optional schema type.
  */
 export class NonOptionalSchema<
-  const TWrapped extends BaseSchema,
-  const TOutput = NonOptional<Output<TWrapped>>
+  TWrapped extends BaseSchema,
+  TOutput = NonOptional<Output<TWrapped>>
 > extends BaseSchema<NonOptional<Input<TWrapped>>, TOutput> {
   /**
    * The schema type.
@@ -57,7 +57,7 @@ export class NonOptionalSchema<
  *
  * @returns A non optional schema.
  */
-export const nonOptional = <const TWrapped extends BaseSchema>(
+export const nonOptional = <TWrapped extends BaseSchema>(
   wrapped: TWrapped,
   message?: ErrorMessage
 ) => new NonOptionalSchema(wrapped, message);

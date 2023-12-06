@@ -18,7 +18,7 @@ export type UnionOptions = [BaseSchema, BaseSchema, ...BaseSchema[]];
  */
 export class UnionSchema<
   const TOptions extends UnionOptions,
-  const TOutput = Output<TOptions[number]>
+  TOutput = Output<TOptions[number]>
 > extends BaseSchema<Input<TOptions[number]>, TOutput> {
   /**
    * The schema type.
@@ -85,7 +85,7 @@ export class UnionSchema<
  *
  * @returns A union schema.
  */
-export const union = <const TOptions extends UnionOptions>(
+export const union = <TOptions extends UnionOptions>(
   options: TOptions,
   message?: ErrorMessage
 ) => new UnionSchema(options, message);

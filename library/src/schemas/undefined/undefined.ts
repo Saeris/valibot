@@ -8,7 +8,7 @@ import { parseResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Undefined schema type.
  */
-export class UndefinedSchema<const TOutput = undefined> extends BaseSchema<
+export class UndefinedSchema<TOutput = undefined> extends BaseSchema<
   undefined,
   TOutput
 > {

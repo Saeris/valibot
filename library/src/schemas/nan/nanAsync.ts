@@ -8,7 +8,7 @@ import { parseResult, schemaIssue } from '../../utils/index.ts';
 /**
  * NaN schema async type.
  */
-export class NanSchemaAsync<const TOutput = number> extends BaseSchemaAsync<
+export class NanSchemaAsync<TOutput = number> extends BaseSchemaAsync<
   number,
   TOutput
 > {

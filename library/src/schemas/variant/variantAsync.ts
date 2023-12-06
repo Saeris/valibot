@@ -36,7 +36,7 @@ export type VariantOptionsAsync<TKey extends string> = [
 export class VariantSchemaAsync<
   const TKey extends string,
   const TOptions extends VariantOptionsAsync<TKey>,
-  const TOutput = Output<TOptions[number]>
+  TOutput = Output<TOptions[number]>
 > extends BaseSchemaAsync<Input<TOptions[number]>, TOutput> {
   /**
    * The schema type.
@@ -146,8 +146,8 @@ export class VariantSchemaAsync<
  * @returns An async variant schema.
  */
 export const variantAsync = <
-  const TKey extends string,
-  const TOptions extends VariantOptionsAsync<TKey>
+  TKey extends string,
+  TOptions extends VariantOptionsAsync<TKey>
 >(
   key: TKey,
   options: TOptions,

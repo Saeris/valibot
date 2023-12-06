@@ -9,10 +9,7 @@ import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Blob schema type.
  */
-export class BlobSchema<const TOutput = Blob> extends BaseSchema<
-  Blob,
-  TOutput
-> {
+export class BlobSchema<TOutput = Blob> extends BaseSchema<Blob, TOutput> {
   /**
    * The schema type.
    */

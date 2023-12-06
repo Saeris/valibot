@@ -13,7 +13,7 @@ import {
 /**
  * Blob schema async type.
  */
-export class BlobSchemaAsync<const TOutput = Blob> extends BaseSchemaAsync<
+export class BlobSchemaAsync<TOutput = Blob> extends BaseSchemaAsync<
   Blob,
   TOutput
 > {

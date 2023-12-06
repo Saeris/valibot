@@ -8,9 +8,10 @@ import { parseResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Undefined schema async type.
  */
-export class UndefinedSchemaAsync<
-  const TOutput = undefined
-> extends BaseSchemaAsync<undefined, TOutput> {
+export class UndefinedSchemaAsync<TOutput = undefined> extends BaseSchemaAsync<
+  undefined,
+  TOutput
+> {
   /**
    * The schema type.
    */

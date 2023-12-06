@@ -13,7 +13,7 @@ import {
 /**
  * Number schema async type.
  */
-export class NumberSchemaAsync<const TOutput = number> extends BaseSchemaAsync<
+export class NumberSchemaAsync<TOutput = number> extends BaseSchemaAsync<
   number,
   TOutput
 > {

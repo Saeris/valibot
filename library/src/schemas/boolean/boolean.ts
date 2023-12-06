@@ -9,7 +9,7 @@ import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Boolean schema type.
  */
-export class BooleanSchema<const TOutput = boolean> extends BaseSchema<
+export class BooleanSchema<TOutput = boolean> extends BaseSchema<
   boolean,
   TOutput
 > {

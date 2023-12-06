@@ -8,10 +8,7 @@ import { parseResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Null schema type.
  */
-export class NullSchema<const TOutput = null> extends BaseSchema<
-  null,
-  TOutput
-> {
+export class NullSchema<TOutput = null> extends BaseSchema<null, TOutput> {
   /**
    * The schema type.
    */

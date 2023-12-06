@@ -13,9 +13,10 @@ import {
 /**
  * Boolean schema async type.
  */
-export class BooleanSchemaAsync<
-  const TOutput = boolean
-> extends BaseSchemaAsync<boolean, TOutput> {
+export class BooleanSchemaAsync<TOutput = boolean> extends BaseSchemaAsync<
+  boolean,
+  TOutput
+> {
   /**
    * The schema type.
    */

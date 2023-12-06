@@ -13,7 +13,7 @@ import {
 /**
  * String schema async type.
  */
-export class StringSchemaAsync<const TOutput = string> extends BaseSchemaAsync<
+export class StringSchemaAsync<TOutput = string> extends BaseSchemaAsync<
   string,
   TOutput
 > {

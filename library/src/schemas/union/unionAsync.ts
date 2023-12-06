@@ -23,7 +23,7 @@ export type UnionOptionsAsync = [
  */
 export class UnionSchemaAsync<
   const TOptions extends UnionOptionsAsync,
-  const TOutput = Output<TOptions[number]>
+  TOutput = Output<TOptions[number]>
 > extends BaseSchemaAsync<Input<TOptions[number]>, TOutput> {
   /**
    * The schema type.
@@ -90,7 +90,7 @@ export class UnionSchemaAsync<
  *
  * @returns An async union schema.
  */
-export const unionAsync = <const TOptions extends UnionOptionsAsync>(
+export const unionAsync = <TOptions extends UnionOptionsAsync>(
   options: TOptions,
   message?: ErrorMessage
 ) => new UnionSchemaAsync(options, message);

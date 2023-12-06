@@ -14,8 +14,8 @@ import {
  * Special schema async type.
  */
 export class SpecialSchemaAsync<
-  const TInput,
-  const TOutput = TInput
+  TInput,
+  TOutput = TInput
 > extends BaseSchemaAsync<TInput, TOutput> {
   /**
    * The schema type.
@@ -88,7 +88,7 @@ export interface SpecialSchemaAsyncFactory {
   ): SpecialSchemaAsync<TInput>;
 }
 
-export const specialAsync: SpecialSchemaAsyncFactory = <const TInput>(
+export const specialAsync: SpecialSchemaAsyncFactory = <TInput>(
   check: (input: unknown) => boolean | Promise<boolean>,
   arg2?: PipeAsync<TInput> | ErrorMessage,
   arg3?: PipeAsync<TInput>

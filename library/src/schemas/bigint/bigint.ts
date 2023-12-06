@@ -9,7 +9,7 @@ import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Bigint schema type.
  */
-export class BigintSchema<const TOutput = bigint> extends BaseSchema<
+export class BigintSchema<TOutput = bigint> extends BaseSchema<
   bigint,
   TOutput
 > {

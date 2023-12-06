@@ -13,7 +13,7 @@ import {
 /**
  * Date schema async type.
  */
-export class DateSchemaAsync<const TOutput = Date> extends BaseSchemaAsync<
+export class DateSchemaAsync<TOutput = Date> extends BaseSchemaAsync<
   Date,
   TOutput
 > {

@@ -17,8 +17,8 @@ export type Enum = {
  * Native enum schema type.
  */
 export class EnumSchema<
-  const TEnum extends Enum,
-  const TOutput = TEnum[keyof TEnum]
+  TEnum extends Enum,
+  TOutput = TEnum[keyof TEnum]
 > extends BaseSchema<TEnum[keyof TEnum], TOutput> {
   /**
    * The schema type.
@@ -58,7 +58,7 @@ export class EnumSchema<
  *
  * @returns A enum schema.
  */
-export const enum_ = <const TEnum extends Enum>(
+export const enum_ = <TEnum extends Enum>(
   enum_: TEnum,
   message?: ErrorMessage
 ) => new EnumSchema(enum_, message);

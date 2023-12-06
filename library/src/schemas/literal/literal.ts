@@ -10,8 +10,8 @@ import type { Literal } from './types.ts';
  * Literal schema type.
  */
 export class LiteralSchema<
-  const TLiteral extends Literal,
-  const TOutput = TLiteral
+  TLiteral extends Literal,
+  TOutput = TLiteral
 > extends BaseSchema<TLiteral, TOutput> {
   /**
    * The schema type.
@@ -51,7 +51,7 @@ export class LiteralSchema<
  *
  * @returns A literal schema.
  */
-export const literal = <const TLiteral extends Literal>(
+export const literal = <TLiteral extends Literal>(
   literal: TLiteral,
   message?: ErrorMessage
 ) => new LiteralSchema(literal, message);

@@ -10,8 +10,8 @@ import type { PicklistOptions } from './types.ts';
  * Picklist schema type.
  */
 export class PicklistSchema<
-  const TOptions extends PicklistOptions,
-  const TOutput = TOptions[number]
+  TOptions extends PicklistOptions,
+  TOutput = TOptions[number]
 > extends BaseSchema<TOptions[number], TOutput> {
   /**
    * The schema type.
@@ -52,8 +52,8 @@ export class PicklistSchema<
  * @returns A picklist schema.
  */
 export const picklist = <
-  const TOption extends string,
-  const TOptions extends PicklistOptions<TOption>
+  TOption extends string,
+  TOptions extends PicklistOptions<TOption>
 >(
   options: TOptions,
   message?: ErrorMessage

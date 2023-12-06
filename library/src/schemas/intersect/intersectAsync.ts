@@ -22,8 +22,8 @@ export type IntersectOptionsAsync = [
  * Intersect schema async type.
  */
 export class IntersectSchemaAsync<
-  const TOptions extends IntersectOptionsAsync,
-  const TOutput = IntersectOutput<TOptions>
+  TOptions extends IntersectOptionsAsync,
+  TOutput = IntersectOutput<TOptions>
 > extends BaseSchemaAsync<IntersectInput<TOptions>, TOutput> {
   /**
    * The schema type.
@@ -124,7 +124,7 @@ export class IntersectSchemaAsync<
  *
  * @returns An async intersect schema.
  */
-export const intersectAsync = <const TOptions extends IntersectOptionsAsync>(
+export const intersectAsync = <TOptions extends IntersectOptionsAsync>(
   options: TOptions,
   message?: ErrorMessage
 ) => new IntersectSchemaAsync(options, message);

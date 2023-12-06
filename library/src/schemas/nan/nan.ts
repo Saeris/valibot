@@ -8,10 +8,7 @@ import { parseResult, schemaIssue } from '../../utils/index.ts';
 /**
  * NaN schema type.
  */
-export class NanSchema<const TOutput = number> extends BaseSchema<
-  number,
-  TOutput
-> {
+export class NanSchema<TOutput = number> extends BaseSchema<number, TOutput> {
   /**
    * The schema type.
    */

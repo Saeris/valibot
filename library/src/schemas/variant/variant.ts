@@ -34,7 +34,7 @@ export type VariantOptions<TKey extends string> = [
 export class VariantSchema<
   const TKey extends string,
   const TOptions extends VariantOptions<TKey>,
-  const TOutput = Output<TOptions[number]>
+  TOutput = Output<TOptions[number]>
 > extends BaseSchema<Input<TOptions[number]>, TOutput> {
   /**
    * The schema type.
@@ -144,8 +144,8 @@ export class VariantSchema<
  * @returns A variant schema.
  */
 export const variant = <
-  const TKey extends string,
-  const TOptions extends VariantOptions<TKey>
+  TKey extends string,
+  TOptions extends VariantOptions<TKey>
 >(
   key: TKey,
   options: TOptions,

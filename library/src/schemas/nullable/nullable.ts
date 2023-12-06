@@ -11,12 +11,12 @@ import { parseResult } from '../../utils/index.ts';
  * Nullable schema type.
  */
 export class NullableSchema<
-  const TWrapped extends BaseSchema,
-  const TDefault extends
+  TWrapped extends BaseSchema,
+  TDefault extends
     | Input<TWrapped>
     | (() => Input<TWrapped> | undefined)
     | undefined = undefined,
-  const TOutput = TDefault extends Input<TWrapped>
+  TOutput = TDefault extends Input<TWrapped>
     ? Output<TWrapped>
     : Output<TWrapped> | null
 > extends BaseSchema<Input<TWrapped> | null, TOutput> {
@@ -62,9 +62,7 @@ export interface NullableSchemaFactory {
    *
    * @returns A nullable schema.
    */
-  <const TWrapped extends BaseSchema>(
-    wrapped: TWrapped
-  ): NullableSchema<TWrapped>;
+  <TWrapped extends BaseSchema>(wrapped: TWrapped): NullableSchema<TWrapped>;
 
   /**
    * Creates a nullable schema.
@@ -75,8 +73,8 @@ export interface NullableSchemaFactory {
    * @returns A nullable schema.
    */
   <
-    const TWrapped extends BaseSchema,
-    const TDefault extends
+    TWrapped extends BaseSchema,
+    TDefault extends
       | Input<TWrapped>
       | (() => Input<TWrapped> | undefined)
       | undefined
@@ -87,8 +85,8 @@ export interface NullableSchemaFactory {
 }
 
 export const nullable: NullableSchemaFactory = <
-  const TWrapped extends BaseSchema,
-  const TDefault extends
+  TWrapped extends BaseSchema,
+  TDefault extends
     | Input<TWrapped>
     | (() => Input<TWrapped> | undefined)
     | undefined = undefined

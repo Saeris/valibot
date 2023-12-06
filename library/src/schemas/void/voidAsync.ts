@@ -8,7 +8,7 @@ import { parseResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Void schema async type.
  */
-export class VoidSchemaAsync<const TOutput = void> extends BaseSchemaAsync<
+export class VoidSchemaAsync<TOutput = void> extends BaseSchemaAsync<
   void,
   TOutput
 > {

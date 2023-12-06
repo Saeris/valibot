@@ -9,10 +9,7 @@ import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Date schema type.
  */
-export class DateSchema<const TOutput = Date> extends BaseSchema<
-  Date,
-  TOutput
-> {
+export class DateSchema<TOutput = Date> extends BaseSchema<Date, TOutput> {
   /**
    * The schema type.
    */

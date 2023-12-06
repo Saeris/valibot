@@ -9,7 +9,7 @@ import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Number schema type.
  */
-export class NumberSchema<const TOutput = number> extends BaseSchema<
+export class NumberSchema<TOutput = number> extends BaseSchema<
   number,
   TOutput
 > {

@@ -19,8 +19,8 @@ import type { ArrayPathItem } from './types.ts';
  * Array schema type.
  */
 export class ArraySchema<
-  const TItem extends BaseSchema,
-  const TOutput = Output<TItem>[]
+  TItem extends BaseSchema,
+  TOutput = Output<TItem>[]
 > extends BaseSchema<Input<TItem>[], TOutput> {
   /**
    * The schema type.
@@ -153,8 +153,8 @@ export interface ArraySchemaFactory {
 }
 
 export const array: ArraySchemaFactory = <
-  const TItem extends BaseSchema,
-  const TOutput = Output<TItem>[]
+  TItem extends BaseSchema,
+  TOutput = Output<TItem>[]
 >(
   item: TItem,
   arg2?: Pipe<TOutput> | ErrorMessage,

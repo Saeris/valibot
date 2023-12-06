@@ -54,7 +54,7 @@ export class NonOptionalSchemaAsync<
  *
  * @returns An async non optional schema.
  */
-export const nonOptionalAsync = (
-  wrapped: BaseSchema | BaseSchemaAsync,
+export const nonOptionalAsync = <TWrapped extends BaseSchema | BaseSchemaAsync>(
+  wrapped: TWrapped,
   message?: ErrorMessage
 ) => new NonOptionalSchemaAsync(wrapped, message);

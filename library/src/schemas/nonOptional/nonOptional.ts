@@ -57,5 +57,7 @@ export class NonOptionalSchema<
  *
  * @returns A non optional schema.
  */
-export const nonOptional = (wrapped: BaseSchema, message?: ErrorMessage) =>
-  new NonOptionalSchema(wrapped, message);
+export const nonOptional = <TWrapped extends BaseSchema>(
+  wrapped: TWrapped,
+  message?: ErrorMessage
+) => new NonOptionalSchema(wrapped, message);

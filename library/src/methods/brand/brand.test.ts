@@ -17,7 +17,9 @@ describe('brand', () => {
     const branded = brand(schema, 'test');
     type Branded = Output<typeof branded>;
     expectTypeOf(schema).not.toEqualTypeOf(branded);
-    expectTypeOf<Branded>().toEqualTypeOf<{ key: string } & Brand<'test'>>();
+    expectTypeOf<Branded>().toEqualTypeOf<{ key: string } & Brand<'test'>>(
+      void undefined as never
+    );
   });
 
   test('should distinguish between brands', () => {

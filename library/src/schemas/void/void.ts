@@ -8,7 +8,10 @@ import { parseResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Void schema type.
  */
-export class VoidSchema<TOutput = void> extends BaseSchema<void, TOutput> {
+export class VoidSchema<const TOutput = void> extends BaseSchema<
+  void,
+  TOutput
+> {
   /**
    * The schema type.
    */

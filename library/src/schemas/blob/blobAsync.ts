@@ -13,7 +13,7 @@ import {
 /**
  * Blob schema async type.
  */
-export class BlobSchemaAsync<TOutput = Blob> extends BaseSchemaAsync<
+export class BlobSchemaAsync<const TOutput = Blob> extends BaseSchemaAsync<
   Blob,
   TOutput
 > {
@@ -31,7 +31,7 @@ export class BlobSchemaAsync<TOutput = Blob> extends BaseSchemaAsync<
   pipe?: PipeAsync<TOutput>;
 
   constructor(
-    arg1?: ErrorMessage | PipeAsync<TOutput>,
+    arg1?: PipeAsync<TOutput> | ErrorMessage,
     arg2?: PipeAsync<TOutput>
   ) {
     super();
@@ -74,6 +74,6 @@ export interface BlobSchemaAsyncFactory {
 }
 
 export const blobAsync: BlobSchemaAsyncFactory = (
-  arg1?: ErrorMessage | PipeAsync<Blob>,
+  arg1?: PipeAsync<Blob> | ErrorMessage,
   arg2?: PipeAsync<Blob>
 ) => new BlobSchemaAsync(arg1, arg2);

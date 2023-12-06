@@ -22,9 +22,9 @@ export type TupleItems = [BaseSchema, ...BaseSchema[]];
  * Tuple schema type.
  */
 export class TupleSchema<
-  TItems extends TupleItems,
-  TRest extends BaseSchema | undefined = undefined,
-  TOutput = TupleOutput<TItems, TRest>
+  const TItems extends TupleItems,
+  const TRest extends BaseSchema | undefined = undefined,
+  const TOutput = TupleOutput<TItems, TRest>
 > extends BaseSchema<TupleInput<TItems, TRest>, TOutput> {
   /**
    * The schema type.
@@ -185,7 +185,7 @@ export interface TupleSchemaFactory {
    *
    * @returns A tuple schema.
    */
-  <TItems extends TupleItems>(
+  <const TItems extends TupleItems>(
     items: TItems,
     pipe?: Pipe<TupleOutput<TItems, undefined>>
   ): TupleSchema<TItems>;
@@ -199,7 +199,7 @@ export interface TupleSchemaFactory {
    *
    * @returns A tuple schema.
    */
-  <TItems extends TupleItems>(
+  <const TItems extends TupleItems>(
     items: TItems,
     message?: ErrorMessage,
     pipe?: Pipe<TupleOutput<TItems, undefined>>
@@ -214,7 +214,7 @@ export interface TupleSchemaFactory {
    *
    * @returns A tuple schema.
    */
-  <TItems extends TupleItems, TRest extends BaseSchema | undefined>(
+  <const TItems extends TupleItems, const TRest extends BaseSchema | undefined>(
     items: TItems,
     rest: TRest,
     pipe?: Pipe<TupleOutput<TItems, TRest>>
@@ -230,7 +230,7 @@ export interface TupleSchemaFactory {
    *
    * @returns A tuple schema.
    */
-  <TItems extends TupleItems, TRest extends BaseSchema | undefined>(
+  <const TItems extends TupleItems, const TRest extends BaseSchema | undefined>(
     items: TItems,
     rest: TRest,
     message?: ErrorMessage,
@@ -239,9 +239,9 @@ export interface TupleSchemaFactory {
 }
 
 export const tuple: TupleSchemaFactory = <
-  TItems extends TupleItems,
-  TRest extends BaseSchema | undefined = undefined,
-  TOutput = TupleOutput<TItems, TRest>
+  const TItems extends TupleItems,
+  const TRest extends BaseSchema | undefined = undefined,
+  const TOutput = TupleOutput<TItems, TRest>
 >(
   items: TItems,
   arg2?: Pipe<TOutput> | ErrorMessage | TRest,

@@ -9,10 +9,10 @@ import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Special schema type.
  */
-export class SpecialSchema<TInput, TOutput = TInput> extends BaseSchema<
-  TInput,
-  TOutput
-> {
+export class SpecialSchema<
+  const TInput,
+  const TOutput = TInput
+> extends BaseSchema<TInput, TOutput> {
   /**
    * The schema type.
    */
@@ -63,7 +63,7 @@ export interface SpecialSchemaFactory {
    *
    * @returns A special schema.
    */
-  <TInput>(
+  <const TInput>(
     check: (input: unknown) => boolean,
     pipe?: Pipe<TInput>
   ): SpecialSchema<TInput>;
@@ -77,14 +77,14 @@ export interface SpecialSchemaFactory {
    *
    * @returns A special schema.
    */
-  <TInput>(
+  <const TInput>(
     check: (input: unknown) => boolean,
     message?: ErrorMessage,
     pipe?: Pipe<TInput>
   ): SpecialSchema<TInput>;
 }
 
-export const special: SpecialSchemaFactory = <TInput>(
+export const special: SpecialSchemaFactory = <const TInput>(
   check: (input: unknown) => boolean,
   arg2?: Pipe<TInput> | ErrorMessage,
   arg3?: Pipe<TInput>

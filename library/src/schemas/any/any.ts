@@ -4,7 +4,7 @@ import { pipeResult } from '../../utils/index.ts';
 /**
  * Any schema type.
  */
-export class AnySchema<TOutput = any> extends BaseSchema<any, TOutput> {
+export class AnySchema<const TOutput = any> extends BaseSchema<any, TOutput> {
   /**
    * The schema type.
    */

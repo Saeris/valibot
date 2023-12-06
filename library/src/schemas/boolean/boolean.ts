@@ -9,7 +9,7 @@ import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Boolean schema type.
  */
-export class BooleanSchema<TOutput = boolean> extends BaseSchema<
+export class BooleanSchema<const TOutput = boolean> extends BaseSchema<
   boolean,
   TOutput
 > {
@@ -26,7 +26,7 @@ export class BooleanSchema<TOutput = boolean> extends BaseSchema<
    */
   pipe?: Pipe<TOutput>;
 
-  constructor(arg1?: ErrorMessage | Pipe<TOutput>, arg2?: Pipe<TOutput>) {
+  constructor(arg1?: Pipe<TOutput> | ErrorMessage, arg2?: Pipe<TOutput>) {
     super();
     // Get message and pipe argument
     const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
@@ -67,6 +67,6 @@ export interface BooleanSchemaFactory {
 }
 
 export const boolean: BooleanSchemaFactory = (
-  arg1?: ErrorMessage | Pipe<boolean>,
+  arg1?: Pipe<boolean> | ErrorMessage,
   arg2?: Pipe<boolean>
 ) => new BooleanSchema(arg1, arg2);

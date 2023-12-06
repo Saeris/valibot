@@ -9,7 +9,10 @@ import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Blob schema type.
  */
-export class BlobSchema<TOutput = Blob> extends BaseSchema<Blob, TOutput> {
+export class BlobSchema<const TOutput = Blob> extends BaseSchema<
+  Blob,
+  TOutput
+> {
   /**
    * The schema type.
    */
@@ -23,7 +26,7 @@ export class BlobSchema<TOutput = Blob> extends BaseSchema<Blob, TOutput> {
    */
   pipe?: Pipe<TOutput>;
 
-  constructor(arg1?: ErrorMessage | Pipe<TOutput>, arg2?: Pipe<TOutput>) {
+  constructor(arg1?: Pipe<TOutput> | ErrorMessage, arg2?: Pipe<TOutput>) {
     super();
     // Get message and pipe argument
     const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
@@ -64,6 +67,6 @@ export interface BlobSchemaFactory {
 }
 
 export const blob: BlobSchemaFactory = (
-  arg1?: ErrorMessage | Pipe<Blob>,
+  arg1?: Pipe<Blob> | ErrorMessage,
   arg2?: Pipe<Blob>
 ) => new BlobSchema(arg1, arg2);

@@ -12,12 +12,12 @@ import { parseResult } from '../../utils/index.ts';
  * Nullish schema async type.
  */
 export class NullishSchemaAsync<
-  TWrapped extends BaseSchema | BaseSchemaAsync,
-  TDefault extends
+  const TWrapped extends BaseSchema | BaseSchemaAsync,
+  const TDefault extends
     | Input<TWrapped>
     | (() => Input<TWrapped> | Promise<Input<TWrapped> | undefined> | undefined)
     | undefined = undefined,
-  TOutput = Awaited<TDefault> extends Input<TWrapped>
+  const TOutput = Awaited<TDefault> extends Input<TWrapped>
     ? Output<TWrapped>
     : Output<TWrapped> | null | undefined
 > extends BaseSchemaAsync<Input<TWrapped> | null | undefined, TOutput> {
@@ -63,7 +63,7 @@ export interface NullishSchemaAsyncFactory {
    *
    * @returns An async nullish schema.
    */
-  <TWrapped extends BaseSchema | BaseSchemaAsync>(
+  <const TWrapped extends BaseSchema | BaseSchemaAsync>(
     wrapped: TWrapped
   ): NullishSchemaAsync<TWrapped>;
 
@@ -76,8 +76,8 @@ export interface NullishSchemaAsyncFactory {
    * @returns An async nullish schema.
    */
   <
-    TWrapped extends BaseSchema | BaseSchemaAsync,
-    TDefault extends
+    const TWrapped extends BaseSchema | BaseSchemaAsync,
+    const TDefault extends
       | Input<TWrapped>
       | (() =>
           | Input<TWrapped>
@@ -91,8 +91,8 @@ export interface NullishSchemaAsyncFactory {
 }
 
 export const nullishAsync: NullishSchemaAsyncFactory = <
-  TWrapped extends BaseSchema | BaseSchemaAsync,
-  TDefault extends
+  const TWrapped extends BaseSchema | BaseSchemaAsync,
+  const TDefault extends
     | Input<TWrapped>
     | (() => Input<TWrapped> | Promise<Input<TWrapped> | undefined> | undefined)
     | undefined = undefined

@@ -18,9 +18,9 @@ import type { MapInput, MapOutput, MapPathItem } from './types.ts';
  * Map schema type.
  */
 export class MapSchema<
-  TKey extends BaseSchema,
-  TValue extends BaseSchema,
-  TOutput = MapOutput<TKey, TValue>
+  const TKey extends BaseSchema,
+  const TValue extends BaseSchema,
+  const TOutput = MapOutput<TKey, TValue>
 > extends BaseSchema<MapInput<TKey, TValue>, TOutput> {
   /**
    * The schema type.
@@ -174,7 +174,7 @@ export interface MapSchemaFactory {
    *
    * @returns A map schema.
    */
-  <TKey extends BaseSchema, TValue extends BaseSchema>(
+  <const TKey extends BaseSchema, const TValue extends BaseSchema>(
     key: TKey,
     value: TValue,
     pipe?: Pipe<MapOutput<TKey, TValue>>
@@ -190,7 +190,7 @@ export interface MapSchemaFactory {
    *
    * @returns A map schema.
    */
-  <TKey extends BaseSchema, TValue extends BaseSchema>(
+  <const TKey extends BaseSchema, const TValue extends BaseSchema>(
     key: TKey,
     value: TValue,
     message?: ErrorMessage,
@@ -199,11 +199,12 @@ export interface MapSchemaFactory {
 }
 
 export const map: MapSchemaFactory = <
-  TKey extends BaseSchema,
-  TValue extends BaseSchema
+  const TKey extends BaseSchema,
+  const TValue extends BaseSchema,
+  const TOutput = MapOutput<TKey, TValue>
 >(
   key: TKey,
   value: TValue,
-  arg3?: Pipe<MapOutput<TKey, TValue>> | ErrorMessage,
-  arg4?: Pipe<MapOutput<TKey, TValue>>
+  arg3?: Pipe<TOutput> | ErrorMessage,
+  arg4?: Pipe<TOutput>
 ) => new MapSchema(key, value, arg3, arg4);

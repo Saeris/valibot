@@ -9,7 +9,7 @@ import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Number schema type.
  */
-export class NumberSchema<TOutput = number> extends BaseSchema<
+export class NumberSchema<const TOutput = number> extends BaseSchema<
   number,
   TOutput
 > {
@@ -26,7 +26,7 @@ export class NumberSchema<TOutput = number> extends BaseSchema<
    */
   pipe?: Pipe<TOutput>;
 
-  constructor(arg1?: ErrorMessage | Pipe<TOutput>, arg2?: Pipe<TOutput>) {
+  constructor(arg1?: Pipe<TOutput> | ErrorMessage, arg2?: Pipe<TOutput>) {
     super();
     // Get message and pipe argument
     const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
@@ -67,6 +67,6 @@ export interface NumberSchemaFactory {
 }
 
 export const number: NumberSchemaFactory = (
-  arg1?: ErrorMessage | Pipe<number>,
+  arg1?: Pipe<number> | ErrorMessage,
   arg2?: Pipe<number>
 ) => new NumberSchema(arg1, arg2);

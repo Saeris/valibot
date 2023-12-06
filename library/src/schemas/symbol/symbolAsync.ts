@@ -8,7 +8,7 @@ import { parseResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Symbol schema async type.
  */
-export class SymbolSchemaAsync<TOutput = symbol> extends BaseSchemaAsync<
+export class SymbolSchemaAsync<const TOutput = symbol> extends BaseSchemaAsync<
   symbol,
   TOutput
 > {

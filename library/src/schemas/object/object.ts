@@ -22,9 +22,9 @@ export type ObjectEntries = Record<string, BaseSchema>;
  * Object schema type.
  */
 export class ObjectSchema<
-  TEntries extends ObjectEntries,
-  TRest extends BaseSchema | undefined = undefined,
-  TOutput = ObjectOutput<TEntries, TRest>
+  const TEntries extends ObjectEntries,
+  const TRest extends BaseSchema | undefined = undefined,
+  const TOutput = ObjectOutput<TEntries, TRest>
 > extends BaseSchema<ObjectInput<TEntries, TRest>, TOutput> {
   /**
    * The schema type.
@@ -195,7 +195,7 @@ export interface ObjectSchemaFactory {
    *
    * @returns An object schema.
    */
-  <TEntries extends ObjectEntries>(
+  <const TEntries extends ObjectEntries>(
     entries: TEntries,
     pipe?: Pipe<ObjectOutput<TEntries, undefined>>
   ): ObjectSchema<TEntries>;
@@ -209,7 +209,7 @@ export interface ObjectSchemaFactory {
    *
    * @returns An object schema.
    */
-  <TEntries extends ObjectEntries>(
+  <const TEntries extends ObjectEntries>(
     entries: TEntries,
     message?: ErrorMessage,
     pipe?: Pipe<ObjectOutput<TEntries, undefined>>
@@ -224,7 +224,10 @@ export interface ObjectSchemaFactory {
    *
    * @returns An object schema.
    */
-  <TEntries extends ObjectEntries, TRest extends BaseSchema | undefined>(
+  <
+    const TEntries extends ObjectEntries,
+    const TRest extends BaseSchema | undefined
+  >(
     entries: TEntries,
     rest: TRest,
     pipe?: Pipe<ObjectOutput<TEntries, TRest>>
@@ -240,7 +243,10 @@ export interface ObjectSchemaFactory {
    *
    * @returns An object schema.
    */
-  <TEntries extends ObjectEntries, TRest extends BaseSchema | undefined>(
+  <
+    const TEntries extends ObjectEntries,
+    const TRest extends BaseSchema | undefined
+  >(
     entries: TEntries,
     rest: TRest,
     message?: ErrorMessage,
@@ -249,11 +255,12 @@ export interface ObjectSchemaFactory {
 }
 
 export const object: ObjectSchemaFactory = <
-  TEntries extends ObjectEntries,
-  TRest extends BaseSchema | undefined = undefined
+  const TEntries extends ObjectEntries,
+  const TRest extends BaseSchema | undefined = undefined,
+  const TOutput = ObjectOutput<TEntries, TRest>
 >(
   entries: TEntries,
-  arg2?: Pipe<ObjectOutput<TEntries, TRest>> | ErrorMessage | TRest,
-  arg3?: Pipe<ObjectOutput<TEntries, TRest>> | ErrorMessage,
-  arg4?: Pipe<ObjectOutput<TEntries, TRest>>
+  arg2?: Pipe<TOutput> | ErrorMessage | TRest,
+  arg3?: Pipe<TOutput> | ErrorMessage,
+  arg4?: Pipe<TOutput>
 ) => new ObjectSchema(entries, arg2, arg3, arg4);

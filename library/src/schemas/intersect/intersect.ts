@@ -17,8 +17,8 @@ export type IntersectOptions = [BaseSchema, BaseSchema, ...BaseSchema[]];
  * Intersect schema type.
  */
 export class IntersectSchema<
-  TOptions extends IntersectOptions,
-  TOutput = IntersectOutput<TOptions>
+  const TOptions extends IntersectOptions,
+  const TOutput = IntersectOutput<TOptions>
 > extends BaseSchema<IntersectInput<TOptions>, TOutput> {
   /**
    * The schema type.
@@ -111,8 +111,10 @@ export class IntersectSchema<
  *
  * @returns An intersect schema.
  */
-export const intersect = (options: IntersectOptions, message?: ErrorMessage) =>
-  new IntersectSchema(options, message);
+export const intersect = <const TOptions extends IntersectOptions>(
+  options: TOptions,
+  message?: ErrorMessage
+) => new IntersectSchema(options, message);
 
 /**
  * See {@link intersect}

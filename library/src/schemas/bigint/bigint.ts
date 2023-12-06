@@ -9,7 +9,7 @@ import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Bigint schema type.
  */
-export class BigintSchema<TOutput = bigint> extends BaseSchema<
+export class BigintSchema<const TOutput = bigint> extends BaseSchema<
   bigint,
   TOutput
 > {
@@ -26,7 +26,7 @@ export class BigintSchema<TOutput = bigint> extends BaseSchema<
    */
   pipe?: Pipe<TOutput>;
 
-  constructor(arg1?: ErrorMessage | Pipe<TOutput>, arg2?: Pipe<TOutput>) {
+  constructor(arg1?: Pipe<TOutput> | ErrorMessage, arg2?: Pipe<TOutput>) {
     super();
     // Get message and pipe argument
     const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
@@ -67,6 +67,6 @@ export interface BaseSchemaFactory {
 }
 
 export const bigint: BaseSchemaFactory = (
-  arg1?: ErrorMessage | Pipe<bigint>,
+  arg1?: Pipe<bigint> | ErrorMessage,
   arg2?: Pipe<bigint>
 ) => new BigintSchema(arg1, arg2);

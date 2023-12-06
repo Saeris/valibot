@@ -27,9 +27,9 @@ export type RecordKey =
  * Record schema type.
  */
 export class RecordSchema<
-  TKey extends RecordKey,
-  TValue extends BaseSchema,
-  TOutput = RecordOutput<TKey, TValue>
+  const TKey extends RecordKey,
+  const TValue extends BaseSchema,
+  const TOutput = RecordOutput<TKey, TValue>
 > extends BaseSchema<RecordInput<TKey, TValue>, TOutput> {
   /**
    * The schema type.
@@ -188,7 +188,7 @@ export interface RecordSchemaFactory {
    *
    * @returns A record schema.
    */
-  <TKey extends StringSchema, TValue extends BaseSchema>(
+  <const TKey extends StringSchema, const TValue extends BaseSchema>(
     value: TValue,
     pipe?: Pipe<RecordOutput<StringSchema, TValue>>
   ): RecordSchema<TKey, TValue>;
@@ -202,7 +202,7 @@ export interface RecordSchemaFactory {
    *
    * @returns A record schema.
    */
-  <TKey extends StringSchema, TValue extends BaseSchema>(
+  <const TKey extends StringSchema, const TValue extends BaseSchema>(
     value: TValue,
     message?: ErrorMessage,
     pipe?: Pipe<RecordOutput<StringSchema, TValue>>
@@ -217,7 +217,7 @@ export interface RecordSchemaFactory {
    *
    * @returns A record schema.
    */
-  <TKey extends RecordKey, TValue extends BaseSchema>(
+  <const TKey extends RecordKey, const TValue extends BaseSchema>(
     key: TKey,
     value: TValue,
     pipe?: Pipe<RecordOutput<TKey, TValue>>
@@ -233,7 +233,7 @@ export interface RecordSchemaFactory {
    *
    * @returns A record schema.
    */
-  <TKey extends RecordKey, TValue extends BaseSchema>(
+  <const TKey extends RecordKey, const TValue extends BaseSchema>(
     key: TKey,
     value: TValue,
     message?: ErrorMessage,
@@ -242,9 +242,9 @@ export interface RecordSchemaFactory {
 }
 
 export const record: RecordSchemaFactory = <
-  TKey extends RecordKey,
-  TValue extends BaseSchema,
-  TOutput = RecordOutput<TKey, TValue>
+  const TKey extends RecordKey,
+  const TValue extends BaseSchema,
+  const TOutput = RecordOutput<TKey, TValue>
 >(
   arg1: TValue | TKey,
   arg2?: Pipe<TOutput> | ErrorMessage | TValue,

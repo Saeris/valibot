@@ -9,7 +9,10 @@ import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Date schema type.
  */
-export class DateSchema<TOutput = Date> extends BaseSchema<Date, TOutput> {
+export class DateSchema<const TOutput = Date> extends BaseSchema<
+  Date,
+  TOutput
+> {
   /**
    * The schema type.
    */
@@ -23,7 +26,7 @@ export class DateSchema<TOutput = Date> extends BaseSchema<Date, TOutput> {
    */
   pipe?: Pipe<TOutput>;
 
-  constructor(arg1?: ErrorMessage | Pipe<TOutput>, arg2?: Pipe<TOutput>) {
+  constructor(arg1?: Pipe<TOutput> | ErrorMessage, arg2?: Pipe<TOutput>) {
     super();
     // Get message and pipe argument
     const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
@@ -64,6 +67,6 @@ export interface DateSchemaFactory {
 }
 
 export const date: DateSchemaFactory = (
-  arg1?: ErrorMessage | Pipe<Date>,
+  arg1?: Pipe<Date> | ErrorMessage,
   arg2?: Pipe<Date>
 ) => new DateSchema(arg1, arg2);

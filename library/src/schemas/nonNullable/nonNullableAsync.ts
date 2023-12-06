@@ -13,8 +13,8 @@ import type { NonNullable } from './nonNullable.ts';
  * Non nullable schema async type.
  */
 export class NonNullableSchemaAsync<
-  TWrapped extends BaseSchema | BaseSchemaAsync,
-  TOutput = NonNullable<Output<TWrapped>>
+  const TWrapped extends BaseSchema | BaseSchemaAsync,
+  const TOutput = NonNullable<Output<TWrapped>>
 > extends BaseSchemaAsync<NonNullable<Input<TWrapped>>, TOutput> {
   /**
    * The schema type.
@@ -54,7 +54,9 @@ export class NonNullableSchemaAsync<
  *
  * @returns An async non nullable schema.
  */
-export const nonNullableAsync = (
-  wrapped: BaseSchema | BaseSchemaAsync,
+export const nonNullableAsync = <
+  const TWrapped extends BaseSchema | BaseSchemaAsync
+>(
+  wrapped: TWrapped,
   message?: ErrorMessage
 ) => new NonNullableSchemaAsync(wrapped, message);

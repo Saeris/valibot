@@ -13,10 +13,9 @@ import {
 /**
  * Boolean schema async type.
  */
-export class BooleanSchemaAsync<TOutput = boolean> extends BaseSchemaAsync<
-  boolean,
-  TOutput
-> {
+export class BooleanSchemaAsync<
+  const TOutput = boolean
+> extends BaseSchemaAsync<boolean, TOutput> {
   /**
    * The schema type.
    */
@@ -31,7 +30,7 @@ export class BooleanSchemaAsync<TOutput = boolean> extends BaseSchemaAsync<
   pipe?: PipeAsync<TOutput>;
 
   constructor(
-    arg1?: ErrorMessage | PipeAsync<TOutput>,
+    arg1?: PipeAsync<TOutput> | ErrorMessage,
     arg2?: PipeAsync<TOutput>
   ) {
     super();
@@ -74,6 +73,6 @@ export interface BooleanSchemaAsyncFactory {
 }
 
 export const booleanAsync: BooleanSchemaAsyncFactory = (
-  arg1?: ErrorMessage | PipeAsync<boolean>,
+  arg1?: PipeAsync<boolean> | ErrorMessage,
   arg2?: PipeAsync<boolean>
 ) => new BooleanSchemaAsync(arg1, arg2);

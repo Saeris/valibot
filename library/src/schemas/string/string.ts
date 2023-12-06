@@ -9,7 +9,7 @@ import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 /**
  * String schema type.
  */
-export class StringSchema<TOutput = string> extends BaseSchema<
+export class StringSchema<const TOutput = string> extends BaseSchema<
   string,
   TOutput
 > {

@@ -15,8 +15,8 @@ import { type Class } from './instance.ts';
  * Instance schema type.
  */
 export class InstanceSchemaAsync<
-  TClass extends Class,
-  TOutput = InstanceType<TClass>
+  const TClass extends Class,
+  const TOutput = InstanceType<TClass>
 > extends BaseSchemaAsync<InstanceType<TClass>, TOutput> {
   /**
    * The schema type.
@@ -68,7 +68,7 @@ export interface InstanceSchemaAsyncFactory {
    *
    * @returns An async instance schema.
    */
-  <TClass extends Class>(
+  <const TClass extends Class>(
     class_: TClass,
     pipe?: PipeAsync<InstanceType<TClass>>
   ): InstanceSchemaAsync<TClass>;
@@ -82,14 +82,16 @@ export interface InstanceSchemaAsyncFactory {
    *
    * @returns An async instance schema.
    */
-  <TClass extends Class>(
+  <const TClass extends Class>(
     class_: TClass,
     message?: ErrorMessage,
     pipe?: PipeAsync<InstanceType<TClass>>
   ): InstanceSchemaAsync<TClass>;
 }
 
-export const instanceAsync: InstanceSchemaAsyncFactory = <TClass extends Class>(
+export const instanceAsync: InstanceSchemaAsyncFactory = <
+  const TClass extends Class
+>(
   class_: TClass,
   arg2?: PipeAsync<InstanceType<TClass>> | ErrorMessage,
   arg3?: PipeAsync<InstanceType<TClass>>

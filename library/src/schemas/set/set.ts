@@ -17,8 +17,8 @@ import type { SetInput, SetOutput, SetPathItem } from './types.ts';
  * Set schema type.
  */
 export class SetSchema<
-  TValue extends BaseSchema,
-  TOutput = SetOutput<TValue>
+  const TValue extends BaseSchema,
+  const TOutput = SetOutput<TValue>
 > extends BaseSchema<SetInput<TValue>, TOutput> {
   /**
    * The schema type.
@@ -128,7 +128,7 @@ export interface SetSchemaFactory {
    *
    * @returns A set schema.
    */
-  <TValue extends BaseSchema>(
+  <const TValue extends BaseSchema>(
     value: TValue,
     pipe?: Pipe<SetOutput<TValue>>
   ): SetSchema<TValue>;
@@ -142,7 +142,7 @@ export interface SetSchemaFactory {
    *
    * @returns A set schema.
    */
-  <TValue extends BaseSchema>(
+  <const TValue extends BaseSchema>(
     value: TValue,
     message?: ErrorMessage,
     pipe?: Pipe<SetOutput<TValue>>
@@ -150,8 +150,8 @@ export interface SetSchemaFactory {
 }
 
 export const set: SetSchemaFactory = <
-  TValue extends BaseSchema,
-  TOutput = SetOutput<TValue>
+  const TValue extends BaseSchema,
+  const TOutput = SetOutput<TValue>
 >(
   value: TValue,
   arg2?: Pipe<TOutput> | ErrorMessage,

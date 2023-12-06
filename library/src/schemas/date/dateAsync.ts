@@ -13,7 +13,7 @@ import {
 /**
  * Date schema async type.
  */
-export class DateSchemaAsync<TOutput = Date> extends BaseSchemaAsync<
+export class DateSchemaAsync<const TOutput = Date> extends BaseSchemaAsync<
   Date,
   TOutput
 > {
@@ -31,7 +31,7 @@ export class DateSchemaAsync<TOutput = Date> extends BaseSchemaAsync<
   pipe?: PipeAsync<TOutput>;
 
   constructor(
-    arg1?: ErrorMessage | PipeAsync<TOutput>,
+    arg1?: PipeAsync<TOutput> | ErrorMessage,
     arg2?: PipeAsync<TOutput>
   ) {
     super();
@@ -74,6 +74,6 @@ export interface DateSchemaAsyncFactory {
 }
 
 export const dateAsync: DateSchemaAsyncFactory = (
-  arg1?: ErrorMessage | PipeAsync<Date>,
+  arg1?: PipeAsync<Date> | ErrorMessage,
   arg2?: PipeAsync<Date>
 ) => new DateSchemaAsync(arg1, arg2);

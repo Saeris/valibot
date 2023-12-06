@@ -11,12 +11,12 @@ import { parseResult } from '../../utils/index.ts';
  * Optional schema type.
  */
 export class OptionalSchema<
-  TWrapped extends BaseSchema,
-  TDefault extends
+  const TWrapped extends BaseSchema,
+  const TDefault extends
     | Input<TWrapped>
     | (() => Input<TWrapped> | undefined)
     | undefined = undefined,
-  TOutput = TDefault extends Input<TWrapped>
+  const TOutput = TDefault extends Input<TWrapped>
     ? Output<TWrapped>
     : Output<TWrapped> | undefined
 > extends BaseSchema<Input<TWrapped> | undefined, TOutput> {
@@ -62,7 +62,9 @@ export interface OptionalSchemaFactory {
    *
    * @returns A optional schema.
    */
-  <TWrapped extends BaseSchema>(wrapped: TWrapped): OptionalSchema<TWrapped>;
+  <const TWrapped extends BaseSchema>(
+    wrapped: TWrapped
+  ): OptionalSchema<TWrapped>;
 
   /**
    * Creates a optional schema.
@@ -73,8 +75,8 @@ export interface OptionalSchemaFactory {
    * @returns A optional schema.
    */
   <
-    TWrapped extends BaseSchema,
-    TDefault extends
+    const TWrapped extends BaseSchema,
+    const TDefault extends
       | Input<TWrapped>
       | (() => Input<TWrapped> | undefined)
       | undefined
@@ -85,8 +87,8 @@ export interface OptionalSchemaFactory {
 }
 
 export const optional: OptionalSchemaFactory = <
-  TWrapped extends BaseSchema,
-  TDefault extends
+  const TWrapped extends BaseSchema,
+  const TDefault extends
     | Input<TWrapped>
     | (() => Input<TWrapped> | undefined)
     | undefined = undefined

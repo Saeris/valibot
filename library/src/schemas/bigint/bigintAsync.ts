@@ -13,7 +13,7 @@ import {
 /**
  * Bigint schema async type.
  */
-export class BigintSchemaAsync<TOutput = bigint> extends BaseSchemaAsync<
+export class BigintSchemaAsync<const TOutput = bigint> extends BaseSchemaAsync<
   bigint,
   TOutput
 > {
@@ -31,7 +31,7 @@ export class BigintSchemaAsync<TOutput = bigint> extends BaseSchemaAsync<
   pipe?: PipeAsync<TOutput>;
 
   constructor(
-    arg1?: ErrorMessage | PipeAsync<TOutput>,
+    arg1?: PipeAsync<TOutput> | ErrorMessage,
     arg2?: PipeAsync<TOutput>
   ) {
     super();
@@ -74,6 +74,6 @@ export interface BigintSchemaAsyncFactory {
 }
 
 export const bigintAsync: BigintSchemaAsyncFactory = (
-  arg1?: ErrorMessage | PipeAsync<bigint>,
+  arg1?: PipeAsync<bigint> | ErrorMessage,
   arg2?: PipeAsync<bigint>
 ) => new BigintSchemaAsync(arg1, arg2);

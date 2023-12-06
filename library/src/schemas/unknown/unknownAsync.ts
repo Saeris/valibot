@@ -8,10 +8,9 @@ import { pipeResultAsync } from '../../utils/index.ts';
 /**
  * Unknown schema async type.
  */
-export class UnknownSchemaAsync<TOutput = unknown> extends BaseSchemaAsync<
-  unknown,
-  TOutput
-> {
+export class UnknownSchemaAsync<
+  const TOutput = unknown
+> extends BaseSchemaAsync<unknown, TOutput> {
   /**
    * The schema type.
    */

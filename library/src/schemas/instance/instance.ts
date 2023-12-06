@@ -15,8 +15,8 @@ export type Class = abstract new (...args: any) => any;
  * Instance schema type.
  */
 export class InstanceSchema<
-  TClass extends Class,
-  TOutput = InstanceType<TClass>
+  const TClass extends Class,
+  const TOutput = InstanceType<TClass>
 > extends BaseSchema<InstanceType<TClass>, TOutput> {
   /**
    * The schema type.
@@ -68,7 +68,7 @@ export interface InstanceSchemaFactory {
    *
    * @returns An instance schema.
    */
-  <TClass extends Class>(
+  <const TClass extends Class>(
     class_: TClass,
     pipe?: Pipe<InstanceType<TClass>>
   ): InstanceSchema<TClass>;
@@ -82,15 +82,18 @@ export interface InstanceSchemaFactory {
    *
    * @returns An instance schema.
    */
-  <TClass extends Class>(
+  <const TClass extends Class>(
     class_: TClass,
     message?: ErrorMessage,
     pipe?: Pipe<InstanceType<TClass>>
   ): InstanceSchema<TClass>;
 }
 
-export const instance: InstanceSchemaFactory = <TClass extends Class>(
+export const instance: InstanceSchemaFactory = <
+  const TClass extends Class,
+  const TOutput = InstanceType<TClass>
+>(
   class_: TClass,
-  arg2?: Pipe<InstanceType<TClass>> | ErrorMessage,
-  arg3?: Pipe<InstanceType<TClass>>
+  arg2?: Pipe<TOutput> | ErrorMessage,
+  arg3?: Pipe<TOutput>
 ) => new InstanceSchema(class_, arg2, arg3);

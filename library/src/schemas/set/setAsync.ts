@@ -18,8 +18,8 @@ import type { SetInput, SetOutput, SetPathItem } from './types.ts';
  * Set schema async type.
  */
 export class SetSchemaAsync<
-  TValue extends BaseSchema | BaseSchemaAsync,
-  TOutput = SetOutput<TValue>
+  const TValue extends BaseSchema | BaseSchemaAsync,
+  const TOutput = SetOutput<TValue>
 > extends BaseSchemaAsync<SetInput<TValue>, TOutput> {
   /**
    * The schema type.
@@ -139,7 +139,7 @@ export interface SetSchemaAsyncFactory {
    *
    * @returns An async set schema.
    */
-  <TValue extends BaseSchema | BaseSchemaAsync>(
+  <const TValue extends BaseSchema | BaseSchemaAsync>(
     value: TValue,
     pipe?: PipeAsync<SetOutput<TValue>>
   ): SetSchemaAsync<TValue>;
@@ -153,7 +153,7 @@ export interface SetSchemaAsyncFactory {
    *
    * @returns An async set schema.
    */
-  <TValue extends BaseSchema | BaseSchemaAsync>(
+  <const TValue extends BaseSchema | BaseSchemaAsync>(
     value: TValue,
     message?: ErrorMessage,
     pipe?: PipeAsync<SetOutput<TValue>>
@@ -161,8 +161,8 @@ export interface SetSchemaAsyncFactory {
 }
 
 export const setAsync: SetSchemaAsyncFactory = <
-  TValue extends BaseSchema | BaseSchemaAsync,
-  TOutput = SetOutput<TValue>
+  const TValue extends BaseSchema | BaseSchemaAsync,
+  const TOutput = SetOutput<TValue>
 >(
   value: TValue,
   arg2?: PipeAsync<TOutput> | ErrorMessage,

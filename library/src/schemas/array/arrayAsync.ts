@@ -20,8 +20,8 @@ import type { ArrayPathItem } from './types.ts';
  * Array schema async type.
  */
 export class ArraySchemaAsync<
-  TItem extends BaseSchema | BaseSchemaAsync,
-  TOutput = Output<TItem>[]
+  const TItem extends BaseSchema | BaseSchemaAsync,
+  const TOutput = Output<TItem>[]
 > extends BaseSchemaAsync<Input<TItem>[], TOutput> {
   /**
    * The schema type.
@@ -163,9 +163,10 @@ export interface ArraySchemaAsyncFactory {
 }
 
 export const arrayAsync: ArraySchemaAsyncFactory = <
-  TItem extends BaseSchema | BaseSchemaAsync
+  const TItem extends BaseSchema | BaseSchemaAsync,
+  const TOutput = Output<TItem>[]
 >(
   item: TItem,
-  arg2?: ErrorMessage | PipeAsync<Output<TItem>[]>,
-  arg3?: PipeAsync<Output<TItem>[]>
+  arg2?: PipeAsync<TOutput> | ErrorMessage,
+  arg3?: PipeAsync<TOutput>
 ) => new ArraySchemaAsync(item, arg2, arg3);

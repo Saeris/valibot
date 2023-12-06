@@ -8,7 +8,7 @@ import { parseResult, schemaIssue } from '../../utils/index.ts';
 /**
  * Symbol schema type.
  */
-export class SymbolSchema<TOutput = symbol> extends BaseSchema<
+export class SymbolSchema<const TOutput = symbol> extends BaseSchema<
   symbol,
   TOutput
 > {

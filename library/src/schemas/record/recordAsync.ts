@@ -36,9 +36,9 @@ export type RecordKeyAsync =
  * Record schema async type.
  */
 export class RecordSchemaAsync<
-  TKey extends RecordKeyAsync,
-  TValue extends BaseSchema | BaseSchemaAsync,
-  TOutput = RecordOutput<TKey, TValue>
+  const TKey extends RecordKeyAsync,
+  const TValue extends BaseSchema | BaseSchemaAsync,
+  const TOutput = RecordOutput<TKey, TValue>
 > extends BaseSchemaAsync<RecordInput<TKey, TValue>, TOutput> {
   /**
    * The schema type.
@@ -194,7 +194,10 @@ export interface RecordSchemaAsyncFactory {
    *
    * @returns An async record schema.
    */
-  <TKey extends RecordKeyAsync, TValue extends BaseSchema | BaseSchemaAsync>(
+  <
+    const TKey extends RecordKeyAsync,
+    const TValue extends BaseSchema | BaseSchemaAsync
+  >(
     value: TValue,
     pipe?: PipeAsync<RecordOutput<StringSchema, TValue>>
   ): RecordSchemaAsync<TKey, TValue>;
@@ -208,7 +211,10 @@ export interface RecordSchemaAsyncFactory {
    *
    * @returns An async record schema.
    */
-  <TKey extends RecordKeyAsync, TValue extends BaseSchema | BaseSchemaAsync>(
+  <
+    const TKey extends RecordKeyAsync,
+    const TValue extends BaseSchema | BaseSchemaAsync
+  >(
     value: TValue,
     message?: ErrorMessage,
     pipe?: PipeAsync<RecordOutput<StringSchema, TValue>>
@@ -223,7 +229,10 @@ export interface RecordSchemaAsyncFactory {
    *
    * @returns An async record schema.
    */
-  <TKey extends RecordKeyAsync, TValue extends BaseSchema | BaseSchemaAsync>(
+  <
+    const TKey extends RecordKeyAsync,
+    const TValue extends BaseSchema | BaseSchemaAsync
+  >(
     key: TKey,
     value: TValue,
     pipe?: PipeAsync<RecordOutput<TKey, TValue>>
@@ -239,7 +248,10 @@ export interface RecordSchemaAsyncFactory {
    *
    * @returns An async record schema.
    */
-  <TKey extends RecordKeyAsync, TValue extends BaseSchema | BaseSchemaAsync>(
+  <
+    const TKey extends RecordKeyAsync,
+    const TValue extends BaseSchema | BaseSchemaAsync
+  >(
     key: TKey,
     value: TValue,
     message?: ErrorMessage,
@@ -248,9 +260,9 @@ export interface RecordSchemaAsyncFactory {
 }
 
 export const recordAsync: RecordSchemaAsyncFactory = <
-  TKey extends RecordKeyAsync,
-  TValue extends BaseSchema | BaseSchemaAsync,
-  TOutput = RecordOutput<TKey, TValue>
+  const TKey extends RecordKeyAsync,
+  const TValue extends BaseSchema | BaseSchemaAsync,
+  const TOutput = RecordOutput<TKey, TValue>
 >(
   arg1: TValue | TKey,
   arg2?: PipeAsync<TOutput> | ErrorMessage | TValue,

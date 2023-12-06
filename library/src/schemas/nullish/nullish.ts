@@ -11,12 +11,12 @@ import { parseResult } from '../../utils/index.ts';
  * Nullish schema type.
  */
 export class NullishSchema<
-  TWrapped extends BaseSchema,
-  TDefault extends
+  const TWrapped extends BaseSchema,
+  const TDefault extends
     | Input<TWrapped>
     | (() => Input<TWrapped> | undefined)
     | undefined = undefined,
-  TOutput = TDefault extends Input<TWrapped>
+  const TOutput = TDefault extends Input<TWrapped>
     ? Output<TWrapped>
     : Output<TWrapped> | null | undefined
 > extends BaseSchema<Input<TWrapped> | null | undefined, TOutput> {
@@ -62,7 +62,9 @@ export interface NullishSchemaFactory {
    *
    * @returns A nullish schema.
    */
-  <TWrapped extends BaseSchema>(wrapped: TWrapped): NullishSchema<TWrapped>;
+  <const TWrapped extends BaseSchema>(
+    wrapped: TWrapped
+  ): NullishSchema<TWrapped>;
 
   /**
    * Creates a nullish schema.
@@ -73,8 +75,8 @@ export interface NullishSchemaFactory {
    * @returns A nullish schema.
    */
   <
-    TWrapped extends BaseSchema,
-    TDefault extends
+    const TWrapped extends BaseSchema,
+    const TDefault extends
       | Input<TWrapped>
       | (() => Input<TWrapped> | undefined)
       | undefined
@@ -85,8 +87,8 @@ export interface NullishSchemaFactory {
 }
 
 export const nullish: NullishSchemaFactory = <
-  TWrapped extends BaseSchema,
-  TDefault extends
+  const TWrapped extends BaseSchema,
+  const TDefault extends
     | Input<TWrapped>
     | (() => Input<TWrapped> | undefined)
     | undefined = undefined

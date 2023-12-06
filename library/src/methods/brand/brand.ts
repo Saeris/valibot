@@ -44,8 +44,8 @@ export type SchemaWithBrand<
  * @returns The branded schema.
  */
 export function brand<
-  TSchema extends BaseSchema | BaseSchemaAsync,
-  TName extends BrandName
+  const TSchema extends BaseSchema | BaseSchemaAsync,
+  const TName extends BrandName
 >(
   schema: TSchema,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

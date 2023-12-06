@@ -26,9 +26,9 @@ export type TupleItemsAsync = [
  * Tuple schema async type.
  */
 export class TupleSchemaAsync<
-  TItems extends TupleItemsAsync,
-  TRest extends BaseSchema | BaseSchemaAsync | undefined = undefined,
-  TOutput = TupleOutput<TItems, TRest>
+  const TItems extends TupleItemsAsync,
+  const TRest extends BaseSchema | BaseSchemaAsync | undefined = undefined,
+  const TOutput = TupleOutput<TItems, TRest>
 > extends BaseSchemaAsync<TupleInput<TItems, TRest>, TOutput> {
   /**
    * The schema type.
@@ -212,7 +212,7 @@ export interface TupleSchemaAsyncFactory {
    *
    * @returns An async tuple schema.
    */
-  <TItems extends TupleItemsAsync>(
+  <const TItems extends TupleItemsAsync>(
     items: TItems,
     pipe?: PipeAsync<TupleOutput<TItems, undefined>>
   ): TupleSchemaAsync<TItems>;
@@ -226,7 +226,7 @@ export interface TupleSchemaAsyncFactory {
    *
    * @returns An async tuple schema.
    */
-  <TItems extends TupleItemsAsync>(
+  <const TItems extends TupleItemsAsync>(
     items: TItems,
     message?: ErrorMessage,
     pipe?: PipeAsync<TupleOutput<TItems, undefined>>
@@ -242,8 +242,8 @@ export interface TupleSchemaAsyncFactory {
    * @returns An async tuple schema.
    */
   <
-    TItems extends TupleItemsAsync,
-    TRest extends BaseSchema | BaseSchemaAsync | undefined
+    const TItems extends TupleItemsAsync,
+    const TRest extends BaseSchema | BaseSchemaAsync | undefined
   >(
     items: TItems,
     rest: TRest,
@@ -261,8 +261,8 @@ export interface TupleSchemaAsyncFactory {
    * @returns An async tuple schema.
    */
   <
-    TItems extends TupleItemsAsync,
-    TRest extends BaseSchema | BaseSchemaAsync | undefined
+    const TItems extends TupleItemsAsync,
+    const TRest extends BaseSchema | BaseSchemaAsync | undefined
   >(
     items: TItems,
     rest: TRest,
@@ -272,9 +272,9 @@ export interface TupleSchemaAsyncFactory {
 }
 
 export const tupleAsync: TupleSchemaAsyncFactory = <
-  TItems extends TupleItemsAsync,
-  TRest extends BaseSchema | BaseSchemaAsync | undefined = undefined,
-  TOutput = TupleOutput<TItems, TRest>
+  const TItems extends TupleItemsAsync,
+  const TRest extends BaseSchema | BaseSchemaAsync | undefined = undefined,
+  const TOutput = TupleOutput<TItems, TRest>
 >(
   items: TItems,
   arg2?: PipeAsync<TOutput> | ErrorMessage | TRest,

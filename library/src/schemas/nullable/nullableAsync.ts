@@ -12,12 +12,12 @@ import { parseResult } from '../../utils/index.ts';
  * Nullable schema async type.
  */
 export class NullableSchemaAsync<
-  TWrapped extends BaseSchema | BaseSchemaAsync,
-  TDefault extends
+  const TWrapped extends BaseSchema | BaseSchemaAsync,
+  const TDefault extends
     | Input<TWrapped>
     | (() => Input<TWrapped> | Promise<Input<TWrapped> | undefined> | undefined)
     | undefined = undefined,
-  TOutput = Awaited<TDefault> extends Input<TWrapped>
+  const TOutput = Awaited<TDefault> extends Input<TWrapped>
     ? Output<TWrapped>
     : Output<TWrapped> | null
 > extends BaseSchemaAsync<Input<TWrapped> | null, TOutput> {
@@ -63,7 +63,7 @@ export interface NullableSchemaAsyncFactory {
    *
    * @returns An async nullable schema.
    */
-  <TWrapped extends BaseSchema | BaseSchemaAsync>(
+  <const TWrapped extends BaseSchema | BaseSchemaAsync>(
     wrapped: TWrapped
   ): NullableSchemaAsync<TWrapped>;
 
@@ -76,8 +76,8 @@ export interface NullableSchemaAsyncFactory {
    * @returns An async nullable schema.
    */
   <
-    TWrapped extends BaseSchema | BaseSchemaAsync,
-    TDefault extends
+    const TWrapped extends BaseSchema | BaseSchemaAsync,
+    const TDefault extends
       | Input<TWrapped>
       | (() =>
           | Input<TWrapped>
@@ -91,8 +91,8 @@ export interface NullableSchemaAsyncFactory {
 }
 
 export const nullableAsync: NullableSchemaAsyncFactory = <
-  TWrapped extends BaseSchema | BaseSchemaAsync,
-  TDefault extends
+  const TWrapped extends BaseSchema | BaseSchemaAsync,
+  const TDefault extends
     | Input<TWrapped>
     | (() => Input<TWrapped> | Promise<Input<TWrapped> | undefined> | undefined)
     | undefined = undefined

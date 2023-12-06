@@ -23,9 +23,9 @@ export type ObjectEntriesAsync = Record<string, BaseSchema | BaseSchemaAsync>;
  * Object schema async type.
  */
 export class ObjectSchemaAsync<
-  TEntries extends ObjectEntriesAsync,
-  TRest extends BaseSchema | BaseSchemaAsync | undefined = undefined,
-  TOutput = ObjectOutput<TEntries, TRest>
+  const TEntries extends ObjectEntriesAsync,
+  const TRest extends BaseSchema | BaseSchemaAsync | undefined = undefined,
+  const TOutput = ObjectOutput<TEntries, TRest>
 > extends BaseSchemaAsync<ObjectInput<TEntries, TRest>, TOutput> {
   /**
    * The schema type.
@@ -221,7 +221,7 @@ export interface ObjectSchemaAsyncFactory {
    *
    * @returns An async object schema.
    */
-  <TEntries extends ObjectEntriesAsync>(
+  <const TEntries extends ObjectEntriesAsync>(
     entries: TEntries,
     pipe?: PipeAsync<ObjectOutput<TEntries, undefined>>
   ): ObjectSchemaAsync<TEntries>;
@@ -235,7 +235,7 @@ export interface ObjectSchemaAsyncFactory {
    *
    * @returns An async object schema.
    */
-  <TEntries extends ObjectEntriesAsync>(
+  <const TEntries extends ObjectEntriesAsync>(
     entries: TEntries,
     message?: ErrorMessage,
     pipe?: PipeAsync<ObjectOutput<TEntries, undefined>>
@@ -251,8 +251,8 @@ export interface ObjectSchemaAsyncFactory {
    * @returns An async object schema.
    */
   <
-    TEntries extends ObjectEntriesAsync,
-    TRest extends BaseSchema | BaseSchemaAsync | undefined
+    const TEntries extends ObjectEntriesAsync,
+    const TRest extends BaseSchema | BaseSchemaAsync | undefined
   >(
     entries: TEntries,
     rest: TRest,
@@ -270,8 +270,8 @@ export interface ObjectSchemaAsyncFactory {
    * @returns An async object schema.
    */
   <
-    TEntries extends ObjectEntriesAsync,
-    TRest extends BaseSchema | BaseSchemaAsync | undefined
+    const TEntries extends ObjectEntriesAsync,
+    const TRest extends BaseSchema | BaseSchemaAsync | undefined
   >(
     entries: TEntries,
     rest: TRest,
@@ -281,11 +281,12 @@ export interface ObjectSchemaAsyncFactory {
 }
 
 export const objectAsync: ObjectSchemaAsyncFactory = <
-  TEntries extends ObjectEntriesAsync,
-  TRest extends BaseSchema | BaseSchemaAsync | undefined = undefined
+  const TEntries extends ObjectEntriesAsync,
+  const TRest extends BaseSchema | BaseSchemaAsync | undefined = undefined,
+  const TOutput = ObjectOutput<TEntries, TRest>
 >(
   entries: TEntries,
-  arg2?: PipeAsync<ObjectOutput<TEntries, TRest>> | ErrorMessage | TRest,
-  arg3?: PipeAsync<ObjectOutput<TEntries, TRest>> | ErrorMessage,
-  arg4?: PipeAsync<ObjectOutput<TEntries, TRest>>
+  arg2?: PipeAsync<TOutput> | ErrorMessage | TRest,
+  arg3?: PipeAsync<TOutput> | ErrorMessage,
+  arg4?: PipeAsync<TOutput>
 ) => new ObjectSchemaAsync(entries, arg2, arg3, arg4);

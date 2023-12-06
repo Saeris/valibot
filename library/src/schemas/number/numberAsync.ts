@@ -13,7 +13,7 @@ import {
 /**
  * Number schema async type.
  */
-export class NumberSchemaAsync<TOutput = number> extends BaseSchemaAsync<
+export class NumberSchemaAsync<const TOutput = number> extends BaseSchemaAsync<
   number,
   TOutput
 > {
@@ -31,7 +31,7 @@ export class NumberSchemaAsync<TOutput = number> extends BaseSchemaAsync<
   pipe?: PipeAsync<TOutput>;
 
   constructor(
-    arg1?: ErrorMessage | PipeAsync<TOutput>,
+    arg1?: PipeAsync<TOutput> | ErrorMessage,
     arg2?: PipeAsync<TOutput>
   ) {
     super();
@@ -74,6 +74,6 @@ export interface NumberSchemaAsyncFactory {
 }
 
 export const numberAsync: NumberSchemaAsyncFactory = (
-  arg1?: ErrorMessage | PipeAsync<number>,
+  arg1?: PipeAsync<number> | ErrorMessage,
   arg2?: PipeAsync<number>
 ) => new NumberSchemaAsync(arg1, arg2);

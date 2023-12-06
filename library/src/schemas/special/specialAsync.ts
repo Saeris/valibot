@@ -1,7 +1,8 @@
-import type {
+import {
   BaseSchemaAsync,
-  ErrorMessage,
-  PipeAsync,
+  type ParseInfo,
+  type ErrorMessage,
+  type PipeAsync,
 } from '../../types/index.ts';
 import {
   defaultArgs,
@@ -12,12 +13,14 @@ import {
 /**
  * Special schema async type.
  */
-export interface SpecialSchemaAsync<TInput, TOutput = TInput>
-  extends BaseSchemaAsync<TInput, TOutput> {
+export class SpecialSchemaAsync<
+  TInput,
+  TOutput = TInput
+> extends BaseSchemaAsync<TInput, TOutput> {
   /**
    * The schema type.
    */
-  type: 'special';
+  readonly type = 'special';
   /**
    * The type check function.
    */
@@ -29,60 +32,64 @@ export interface SpecialSchemaAsync<TInput, TOutput = TInput>
   /**
    * The validation and transformation pipeline.
    */
-  pipe: PipeAsync<TInput> | undefined;
+  pipe?: PipeAsync<TOutput>;
+
+  constructor(
+    check: (input: unknown) => boolean | Promise<boolean>,
+    arg2?: PipeAsync<TOutput> | ErrorMessage,
+    arg3?: PipeAsync<TOutput>
+  ) {
+    super();
+    // Get message and pipe argument
+    const [message = 'Invalid type', pipe] = defaultArgs(arg2, arg3);
+    this.check = check;
+    this.message = message;
+    this.pipe = pipe;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (!(await this.check(input))) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Execute pipe and return result
+    return pipeResultAsync(input as TOutput, this.pipe, info, this.type);
+  }
 }
 
-/**
- * Creates an async special schema.
- *
- * @param check The type check function.
- * @param pipe A validation and transformation pipe.
- *
- * @returns An async special schema.
- */
-export function specialAsync<TInput>(
-  check: (input: unknown) => boolean | Promise<boolean>,
-  pipe?: PipeAsync<TInput>
-): SpecialSchemaAsync<TInput>;
+export interface SpecialSchemaAsyncFactory {
+  /**
+   * Creates an async special schema.
+   *
+   * @param check The type check function.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns An async special schema.
+   */
+  <TInput>(
+    check: (input: unknown) => boolean | Promise<boolean>,
+    pipe?: PipeAsync<TInput>
+  ): SpecialSchemaAsync<TInput>;
 
-/**
- * Creates a special schema.
- *
- * @param check The type check function.
- * @param message The error message.
- * @param pipe A validation and transformation pipe.
- *
- * @returns A special schema.
- */
-export function specialAsync<TInput>(
-  check: (input: unknown) => boolean | Promise<boolean>,
-  message?: ErrorMessage,
-  pipe?: PipeAsync<TInput>
-): SpecialSchemaAsync<TInput>;
+  /**
+   * Creates a special schema.
+   *
+   * @param check The type check function.
+   * @param message The error message.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns A special schema.
+   */
+  <TInput>(
+    check: (input: unknown) => boolean | Promise<boolean>,
+    message?: ErrorMessage,
+    pipe?: PipeAsync<TInput>
+  ): SpecialSchemaAsync<TInput>;
+}
 
-export function specialAsync<TInput>(
+export const specialAsync: SpecialSchemaAsyncFactory = <TInput>(
   check: (input: unknown) => boolean | Promise<boolean>,
   arg2?: PipeAsync<TInput> | ErrorMessage,
   arg3?: PipeAsync<TInput>
-): SpecialSchemaAsync<TInput> {
-  // Get message and pipe argument
-  const [message = 'Invalid type', pipe] = defaultArgs(arg2, arg3);
-
-  // Create and return string schema
-  return {
-    type: 'special',
-    async: true,
-    check,
-    message,
-    pipe,
-    async _parse(input, info) {
-      // Check type of input
-      if (!(await this.check(input))) {
-        return schemaIssue(info, 'type', 'special', this.message, input);
-      }
-
-      // Execute pipe and return result
-      return pipeResultAsync(input as TInput, this.pipe, info, 'special');
-    },
-  };
-}
+) => new SpecialSchemaAsync(check, arg2, arg3);

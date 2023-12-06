@@ -1,18 +1,27 @@
-import type { BaseSchema, Pipe } from '../../types/index.ts';
+import { BaseSchema, type ParseInfo, type Pipe } from '../../types/index.ts';
 import { pipeResult } from '../../utils/index.ts';
 
 /**
  * Any schema type.
  */
-export interface AnySchema<TOutput = any> extends BaseSchema<any, TOutput> {
+export class AnySchema<TOutput = any> extends BaseSchema<any, TOutput> {
   /**
    * The schema type.
    */
-  type: 'any';
+  readonly type = 'any';
   /**
    * The validation and transformation pipeline.
    */
-  pipe: Pipe<any> | undefined;
+  pipe?: Pipe<any>;
+
+  constructor(pipe?: Pipe<any>) {
+    super();
+    this.pipe = pipe;
+  }
+
+  _parse(input: unknown, info?: ParseInfo) {
+    return pipeResult(input, this.pipe, info, this.type);
+  }
 }
 
 /**
@@ -22,13 +31,4 @@ export interface AnySchema<TOutput = any> extends BaseSchema<any, TOutput> {
  *
  * @returns A any schema.
  */
-export function any(pipe?: Pipe<any>): AnySchema {
-  return {
-    type: 'any',
-    async: false,
-    pipe,
-    _parse(input, info) {
-      return pipeResult(input, this.pipe, info, 'any');
-    },
-  };
-}
+export const any = (pipe?: Pipe<any>) => new AnySchema(pipe);

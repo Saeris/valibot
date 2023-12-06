@@ -1,16 +1,22 @@
-import type { BaseSchema, ErrorMessage } from '../../types/index.ts';
+import {
+  BaseSchema,
+  type ParseInfo,
+  type ErrorMessage,
+} from '../../types/index.ts';
 import { parseResult, schemaIssue } from '../../utils/index.ts';
 import type { Literal } from './types.ts';
 
 /**
  * Literal schema type.
  */
-export interface LiteralSchema<TLiteral extends Literal, TOutput = TLiteral>
-  extends BaseSchema<TLiteral, TOutput> {
+export class LiteralSchema<
+  TLiteral extends Literal,
+  TOutput = TLiteral
+> extends BaseSchema<TLiteral, TOutput> {
   /**
    * The schema type.
    */
-  type: 'literal';
+  readonly type = 'literal';
   /**
    * The literal value.
    */
@@ -19,6 +25,22 @@ export interface LiteralSchema<TLiteral extends Literal, TOutput = TLiteral>
    * The error message.
    */
   message: ErrorMessage;
+
+  constructor(literal: TLiteral, message: ErrorMessage = 'Invalid type') {
+    super();
+    this.literal = literal;
+    this.message = message;
+  }
+
+  _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (input !== this.literal) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Return parse result
+    return parseResult(true, input as TOutput);
+  }
 }
 
 /**
@@ -29,23 +51,5 @@ export interface LiteralSchema<TLiteral extends Literal, TOutput = TLiteral>
  *
  * @returns A literal schema.
  */
-export function literal<TLiteral extends Literal>(
-  literal: TLiteral,
-  message: ErrorMessage = 'Invalid type'
-): LiteralSchema<TLiteral> {
-  return {
-    type: 'literal',
-    async: false,
-    literal,
-    message,
-    _parse(input, info) {
-      // Check type of input
-      if (input !== this.literal) {
-        return schemaIssue(info, 'type', 'literal', this.message, input);
-      }
-
-      // Return parse result
-      return parseResult(true, input as TLiteral);
-    },
-  };
-}
+export const literal = (literal: Literal, message?: ErrorMessage) =>
+  new LiteralSchema(literal, message);

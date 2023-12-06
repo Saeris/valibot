@@ -1,9 +1,10 @@
-import type {
-  BaseSchema,
+import {
+  type BaseSchema,
   BaseSchemaAsync,
-  ErrorMessage,
-  Issues,
-  PipeAsync,
+  type ParseInfo,
+  type ErrorMessage,
+  type Issues,
+  type PipeAsync,
 } from '../../types/index.ts';
 import {
   parseResult,
@@ -34,7 +35,7 @@ export type RecordKeyAsync =
 /**
  * Record schema async type.
  */
-export interface RecordSchemaAsync<
+export class RecordSchemaAsync<
   TKey extends RecordKeyAsync,
   TValue extends BaseSchema | BaseSchemaAsync,
   TOutput = RecordOutput<TKey, TValue>
@@ -42,7 +43,7 @@ export interface RecordSchemaAsync<
   /**
    * The schema type.
    */
-  type: 'record';
+  readonly type = 'record';
   /**
    * The key schema.
    */
@@ -58,204 +59,201 @@ export interface RecordSchemaAsync<
   /**
    * The validation and transformation pipeline.
    */
-  pipe: PipeAsync<RecordOutput<TKey, TValue>> | undefined;
-}
+  pipe?: PipeAsync<TOutput>;
 
-/**
- * Creates an async record schema.
- *
- * @param value The value schema.
- * @param pipe A validation and transformation pipe.
- *
- * @returns An async record schema.
- */
-export function recordAsync<TValue extends BaseSchema | BaseSchemaAsync>(
-  value: TValue,
-  pipe?: PipeAsync<RecordOutput<StringSchema, TValue>>
-): RecordSchemaAsync<StringSchema, TValue>;
+  constructor(
+    arg1: TValue | TKey,
+    arg2?: PipeAsync<TOutput> | ErrorMessage | TValue,
+    arg3?: PipeAsync<TOutput> | ErrorMessage,
+    arg4?: PipeAsync<TOutput>
+  ) {
+    super();
+    // Get key, value, message and pipe argument
+    const [key, value, message = 'Invalid type', pipe] = recordArgs<
+      TKey,
+      TValue,
+      PipeAsync<TOutput>
+    >(arg1, arg2, arg3, arg4);
+    this.key = key;
+    this.value = value;
+    this.message = message;
+    this.pipe = pipe;
+  }
 
-/**
- * Creates an async record schema.
- *
- * @param value The value schema.
- * @param message The error message.
- * @param pipe A validation and transformation pipe.
- *
- * @returns An async record schema.
- */
-export function recordAsync<TValue extends BaseSchema | BaseSchemaAsync>(
-  value: TValue,
-  message?: ErrorMessage,
-  pipe?: PipeAsync<RecordOutput<StringSchema, TValue>>
-): RecordSchemaAsync<StringSchema, TValue>;
+  async _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (!input || typeof input !== 'object') {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
 
-/**
- * Creates an async record schema.
- *
- * @param key The key schema.
- * @param value The value schema.
- * @param pipe A validation and transformation pipe.
- *
- * @returns An async record schema.
- */
-export function recordAsync<
-  TKey extends RecordKeyAsync,
-  TValue extends BaseSchema | BaseSchemaAsync
->(
-  key: TKey,
-  value: TValue,
-  pipe?: PipeAsync<RecordOutput<TKey, TValue>>
-): RecordSchemaAsync<TKey, TValue>;
+    // Create typed, issues and output
+    let typed = true;
+    let issues: Issues | undefined;
+    const output: Record<string | number | symbol, any> = {};
 
-/**
- * Creates an async record schema.
- *
- * @param key The key schema.
- * @param value The value schema.
- * @param message The error message.
- * @param pipe A validation and transformation pipe.
- *
- * @returns An async record schema.
- */
-export function recordAsync<
-  TKey extends RecordKeyAsync,
-  TValue extends BaseSchema | BaseSchemaAsync
->(
-  key: TKey,
-  value: TValue,
-  message?: ErrorMessage,
-  pipe?: PipeAsync<RecordOutput<TKey, TValue>>
-): RecordSchemaAsync<TKey, TValue>;
+    // Parse each key and value by schema
+    await Promise.all(
+      // Note: `Object.entries(...)` converts each key to a string
+      Object.entries(input).map(async ([inputKey, inputValue]) => {
+        // Exclude blocked keys to prevent prototype pollutions
+        if (!BLOCKED_KEYS.includes(inputKey)) {
+          // Create path item variable
+          let pathItem: RecordPathItem | undefined;
 
-export function recordAsync<
-  TKey extends RecordKeyAsync,
-  TValue extends BaseSchema | BaseSchemaAsync
->(
-  arg1: TValue | TKey,
-  arg2?: PipeAsync<RecordOutput<TKey, TValue>> | ErrorMessage | TValue,
-  arg3?: PipeAsync<RecordOutput<TKey, TValue>> | ErrorMessage,
-  arg4?: PipeAsync<RecordOutput<TKey, TValue>>
-): RecordSchemaAsync<TKey, TValue> {
-  // Get key, value, message and pipe argument
-  const [key, value, message = 'Invalid type', pipe] = recordArgs<
-    TKey,
-    TValue,
-    PipeAsync<RecordOutput<TKey, TValue>>
-  >(arg1, arg2, arg3, arg4);
+          // Get parse result of key and value
+          const [keyResult, valueResult] = await Promise.all(
+            (
+              [
+                { schema: this.key, value: inputKey, origin: 'key' },
+                { schema: this.value, value: inputValue, origin: 'value' },
+              ] as const
+            ).map(async ({ schema, value, origin }) => {
+              // If not aborted early, continue execution
+              if (!(info?.abortEarly && issues)) {
+                // Get parse result of value
+                const result = await schema._parse(value, {
+                  origin,
+                  abortEarly: info?.abortEarly,
+                  abortPipeEarly: info?.abortPipeEarly,
+                  skipPipe: info?.skipPipe,
+                });
 
-  // Create and return async record schema
-  return {
-    type: 'record',
-    async: true,
-    key,
-    value,
-    message,
-    pipe,
-    async _parse(input, info) {
-      // Check type of input
-      if (!input || typeof input !== 'object') {
-        return schemaIssue(info, 'type', 'record', this.message, input);
-      }
-
-      // Create typed, issues and output
-      let typed = true;
-      let issues: Issues | undefined;
-      const output: Record<string | number | symbol, any> = {};
-
-      // Parse each key and value by schema
-      await Promise.all(
-        // Note: `Object.entries(...)` converts each key to a string
-        Object.entries(input).map(async ([inputKey, inputValue]) => {
-          // Exclude blocked keys to prevent prototype pollutions
-          if (!BLOCKED_KEYS.includes(inputKey)) {
-            // Create path item variable
-            let pathItem: RecordPathItem | undefined;
-
-            // Get parse result of key and value
-            const [keyResult, valueResult] = await Promise.all(
-              (
-                [
-                  { schema: this.key, value: inputKey, origin: 'key' },
-                  { schema: this.value, value: inputValue, origin: 'value' },
-                ] as const
-              ).map(async ({ schema, value, origin }) => {
                 // If not aborted early, continue execution
                 if (!(info?.abortEarly && issues)) {
-                  // Get parse result of value
-                  const result = await schema._parse(value, {
-                    origin,
-                    abortEarly: info?.abortEarly,
-                    abortPipeEarly: info?.abortPipeEarly,
-                    skipPipe: info?.skipPipe,
-                  });
+                  // If there are issues, capture them
+                  if (result.issues) {
+                    // Create record path item
+                    pathItem = pathItem || {
+                      type: 'record',
+                      input: input as Record<string | number | symbol, unknown>,
+                      key: inputKey,
+                      value: inputValue,
+                    };
 
-                  // If not aborted early, continue execution
-                  if (!(info?.abortEarly && issues)) {
-                    // If there are issues, capture them
-                    if (result.issues) {
-                      // Create record path item
-                      pathItem = pathItem || {
-                        type: 'record',
-                        input: input as Record<
-                          string | number | symbol,
-                          unknown
-                        >,
-                        key: inputKey,
-                        value: inputValue,
-                      };
-
-                      // Add modified result issues to issues
-                      for (const issue of result.issues) {
-                        if (issue.path) {
-                          issue.path.unshift(pathItem);
-                        } else {
-                          issue.path = [pathItem];
-                        }
-                        issues?.push(issue);
+                    // Add modified result issues to issues
+                    for (const issue of result.issues) {
+                      if (issue.path) {
+                        issue.path.unshift(pathItem);
+                      } else {
+                        issue.path = [pathItem];
                       }
-                      if (!issues) {
-                        issues = result.issues;
-                      }
-
-                      // If necessary, abort early
-                      if (info?.abortEarly) {
-                        throw null;
-                      }
+                      issues?.push(issue);
+                    }
+                    if (!issues) {
+                      issues = result.issues;
                     }
 
-                    // Return parse result
-                    return result;
+                    // If necessary, abort early
+                    if (info?.abortEarly) {
+                      throw null;
+                    }
                   }
+
+                  // Return parse result
+                  return result;
                 }
-              })
-            ).catch(() => []);
+              }
+            })
+          ).catch(() => []);
 
-            // If not typed, set typed to false
-            if (!keyResult?.typed || !valueResult?.typed) {
-              typed = false;
-            }
-
-            // If key is typed, set output of entry
-            if (keyResult?.typed && valueResult) {
-              output[keyResult.output] = valueResult.output;
-            }
+          // If not typed, set typed to false
+          if (!keyResult?.typed || !valueResult?.typed) {
+            typed = false;
           }
-        })
+
+          // If key is typed, set output of entry
+          if (keyResult?.typed && valueResult) {
+            output[keyResult.output] = valueResult.output;
+          }
+        }
+      })
+    );
+
+    // If output is typed, execute pipe
+    if (typed) {
+      return pipeResultAsync(
+        output as TOutput,
+        this.pipe,
+        info,
+        this.type,
+        issues
       );
+    }
 
-      // If output is typed, execute pipe
-      if (typed) {
-        return pipeResultAsync(
-          output as RecordOutput<TKey, TValue>,
-          this.pipe,
-          info,
-          'record',
-          issues
-        );
-      }
-
-      // Otherwise, return untyped parse result
-      return parseResult(false, output, issues as Issues);
-    },
-  };
+    // Otherwise, return untyped parse result
+    return parseResult(false, output, issues as Issues);
+  }
 }
+
+export interface RecordSchemaAsyncFactory {
+  /**
+   * Creates an async record schema.
+   *
+   * @param value The value schema.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns An async record schema.
+   */
+  <TKey extends RecordKeyAsync, TValue extends BaseSchema | BaseSchemaAsync>(
+    value: TValue,
+    pipe?: PipeAsync<RecordOutput<StringSchema, TValue>>
+  ): RecordSchemaAsync<TKey, TValue>;
+
+  /**
+   * Creates an async record schema.
+   *
+   * @param value The value schema.
+   * @param message The error message.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns An async record schema.
+   */
+  <TKey extends RecordKeyAsync, TValue extends BaseSchema | BaseSchemaAsync>(
+    value: TValue,
+    message?: ErrorMessage,
+    pipe?: PipeAsync<RecordOutput<StringSchema, TValue>>
+  ): RecordSchemaAsync<TKey, TValue>;
+
+  /**
+   * Creates an async record schema.
+   *
+   * @param key The key schema.
+   * @param value The value schema.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns An async record schema.
+   */
+  <TKey extends RecordKeyAsync, TValue extends BaseSchema | BaseSchemaAsync>(
+    key: TKey,
+    value: TValue,
+    pipe?: PipeAsync<RecordOutput<TKey, TValue>>
+  ): RecordSchemaAsync<TKey, TValue>;
+
+  /**
+   * Creates an async record schema.
+   *
+   * @param key The key schema.
+   * @param value The value schema.
+   * @param message The error message.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns An async record schema.
+   */
+  <TKey extends RecordKeyAsync, TValue extends BaseSchema | BaseSchemaAsync>(
+    key: TKey,
+    value: TValue,
+    message?: ErrorMessage,
+    pipe?: PipeAsync<RecordOutput<TKey, TValue>>
+  ): RecordSchemaAsync<TKey, TValue>;
+}
+
+export const recordAsync: RecordSchemaAsyncFactory = <
+  TKey extends RecordKeyAsync,
+  TValue extends BaseSchema | BaseSchemaAsync,
+  TOutput = RecordOutput<TKey, TValue>
+>(
+  arg1: TValue | TKey,
+  arg2?: PipeAsync<TOutput> | ErrorMessage | TValue,
+  arg3?: PipeAsync<TOutput> | ErrorMessage,
+  arg4?: PipeAsync<TOutput>
+) => new RecordSchemaAsync(arg1, arg2, arg3, arg4);

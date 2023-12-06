@@ -1,8 +1,9 @@
-import type {
+import {
   BaseSchema,
-  ErrorMessage,
-  Issues,
-  Pipe,
+  type ParseInfo,
+  type ErrorMessage,
+  type Issues,
+  type Pipe,
 } from '../../types/index.ts';
 import {
   defaultArgs,
@@ -15,14 +16,14 @@ import type { SetInput, SetOutput, SetPathItem } from './types.ts';
 /**
  * Set schema type.
  */
-export interface SetSchema<
+export class SetSchema<
   TValue extends BaseSchema,
   TOutput = SetOutput<TValue>
 > extends BaseSchema<SetInput<TValue>, TOutput> {
   /**
    * The schema type.
    */
-  type: 'set';
+  readonly type = 'set';
   /**
    * The set value schema.
    */
@@ -34,118 +35,125 @@ export interface SetSchema<
   /**
    * The validation and transformation pipeline.
    */
-  pipe: Pipe<SetOutput<TValue>> | undefined;
-}
+  pipe?: Pipe<TOutput>;
 
-/**
- * Creates a set schema.
- *
- * @param value The value schema.
- * @param pipe A validation and transformation pipe.
- *
- * @returns A set schema.
- */
-export function set<TValue extends BaseSchema>(
-  value: TValue,
-  pipe?: Pipe<SetOutput<TValue>>
-): SetSchema<TValue>;
+  constructor(
+    value: TValue,
+    arg2?: Pipe<TOutput> | ErrorMessage,
+    arg3?: Pipe<TOutput>
+  ) {
+    super();
+    // Get message and pipe argument
+    const [message = 'Invalid type', pipe] = defaultArgs(arg2, arg3);
+    this.value = value;
+    this.message = message;
+    this.pipe = pipe;
+  }
 
-/**
- * Creates a set schema.
- *
- * @param value The value schema.
- * @param message The error message.
- * @param pipe A validation and transformation pipe.
- *
- * @returns A set schema.
- */
-export function set<TValue extends BaseSchema>(
-  value: TValue,
-  message?: ErrorMessage,
-  pipe?: Pipe<SetOutput<TValue>>
-): SetSchema<TValue>;
+  _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (!(input instanceof Set)) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
 
-export function set<TValue extends BaseSchema>(
-  value: TValue,
-  arg2?: Pipe<SetOutput<TValue>> | ErrorMessage,
-  arg3?: Pipe<SetOutput<TValue>>
-): SetSchema<TValue> {
-  // Get message and pipe argument
-  const [message = 'Invalid type', pipe] = defaultArgs(arg2, arg3);
+    // Create key, typed, output and issues
+    let key = 0;
+    let typed = true;
+    let issues: Issues | undefined;
+    const output: SetOutput<TValue> = new Set();
 
-  // Create and return set schema
-  return {
-    type: 'set',
-    async: false,
-    value,
-    message,
-    pipe,
-    _parse(input, info) {
-      // Check type of input
-      if (!(input instanceof Set)) {
-        return schemaIssue(info, 'type', 'set', this.message, input);
-      }
+    // Parse each value by schema
+    for (const inputValue of input) {
+      // Get parse result of input value
+      const result = this.value._parse(inputValue, info);
 
-      // Create key, typed, output and issues
-      let key = 0;
-      let typed = true;
-      let issues: Issues | undefined;
-      const output: SetOutput<TValue> = new Set();
+      // If there are issues, capture them
+      if (result.issues) {
+        // Create set path item
+        const pathItem: SetPathItem = {
+          type: 'set',
+          input,
+          key,
+          value: inputValue,
+        };
 
-      // Parse each value by schema
-      for (const inputValue of input) {
-        // Get parse result of input value
-        const result = this.value._parse(inputValue, info);
-
-        // If there are issues, capture them
-        if (result.issues) {
-          // Create set path item
-          const pathItem: SetPathItem = {
-            type: 'set',
-            input,
-            key,
-            value: inputValue,
-          };
-
-          // Add modified result issues to issues
-          for (const issue of result.issues) {
-            if (issue.path) {
-              issue.path.unshift(pathItem);
-            } else {
-              issue.path = [pathItem];
-            }
-            issues?.push(issue);
+        // Add modified result issues to issues
+        for (const issue of result.issues) {
+          if (issue.path) {
+            issue.path.unshift(pathItem);
+          } else {
+            issue.path = [pathItem];
           }
-          if (!issues) {
-            issues = result.issues;
-          }
-
-          // If necessary, abort early
-          if (info?.abortEarly) {
-            typed = false;
-            break;
-          }
+          issues?.push(issue);
+        }
+        if (!issues) {
+          issues = result.issues;
         }
 
-        // If not typed, set typed to false
-        if (!result.typed) {
+        // If necessary, abort early
+        if (info?.abortEarly) {
           typed = false;
+          break;
         }
-
-        // Set output of entry if necessary
-        output.add(result.output);
-
-        // Increment key
-        key++;
       }
 
-      // If output is typed, execute pipe
-      if (typed) {
-        return pipeResult(output, this.pipe, info, 'set', issues);
+      // If not typed, set typed to false
+      if (!result.typed) {
+        typed = false;
       }
 
-      // Otherwise, return untyped parse result
-      return parseResult(false, output, issues as Issues);
-    },
-  };
+      // Set output of entry if necessary
+      output.add(result.output);
+
+      // Increment key
+      key++;
+    }
+
+    // If output is typed, execute pipe
+    if (typed) {
+      return pipeResult(output as TOutput, this.pipe, info, this.type, issues);
+    }
+
+    // Otherwise, return untyped parse result
+    return parseResult(false, output, issues as Issues);
+  }
 }
+
+export interface SetSchemaFactory {
+  /**
+   * Creates a set schema.
+   *
+   * @param value The value schema.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns A set schema.
+   */
+  <TValue extends BaseSchema>(
+    value: TValue,
+    pipe?: Pipe<SetOutput<TValue>>
+  ): SetSchema<TValue>;
+
+  /**
+   * Creates a set schema.
+   *
+   * @param value The value schema.
+   * @param message The error message.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns A set schema.
+   */
+  <TValue extends BaseSchema>(
+    value: TValue,
+    message?: ErrorMessage,
+    pipe?: Pipe<SetOutput<TValue>>
+  ): SetSchema<TValue>;
+}
+
+export const set: SetSchemaFactory = <
+  TValue extends BaseSchema,
+  TOutput = SetOutput<TValue>
+>(
+  value: TValue,
+  arg2?: Pipe<TOutput> | ErrorMessage,
+  arg3?: Pipe<TOutput>
+) => new SetSchema(value, arg2, arg3);

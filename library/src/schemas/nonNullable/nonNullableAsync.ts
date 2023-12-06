@@ -1,9 +1,10 @@
-import type {
-  BaseSchema,
+import {
+  type BaseSchema,
   BaseSchemaAsync,
-  ErrorMessage,
-  Input,
-  Output,
+  type ParseInfo,
+  type ErrorMessage,
+  type Input,
+  type Output,
 } from '../../types/index.ts';
 import { schemaIssue } from '../../utils/index.ts';
 import type { NonNullable } from './nonNullable.ts';
@@ -11,14 +12,14 @@ import type { NonNullable } from './nonNullable.ts';
 /**
  * Non nullable schema async type.
  */
-export interface NonNullableSchemaAsync<
+export class NonNullableSchemaAsync<
   TWrapped extends BaseSchema | BaseSchemaAsync,
   TOutput = NonNullable<Output<TWrapped>>
 > extends BaseSchemaAsync<NonNullable<Input<TWrapped>>, TOutput> {
   /**
    * The schema type.
    */
-  type: 'non_nullable';
+  readonly type = 'non_nullable';
   /**
    * The wrapped schema.
    */
@@ -27,6 +28,22 @@ export interface NonNullableSchemaAsync<
    * The error message.
    */
   message: ErrorMessage;
+
+  constructor(wrapped: TWrapped, message: ErrorMessage = 'Invalid type') {
+    super();
+    this.wrapped = wrapped;
+    this.message = message;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    // Allow `null` values not to pass
+    if (input === null) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Return result of wrapped schema
+    return this.wrapped._parse(input, info);
+  }
 }
 
 /**
@@ -37,23 +54,7 @@ export interface NonNullableSchemaAsync<
  *
  * @returns An async non nullable schema.
  */
-export function nonNullableAsync<TWrapped extends BaseSchema | BaseSchemaAsync>(
-  wrapped: TWrapped,
-  message: ErrorMessage = 'Invalid type'
-): NonNullableSchemaAsync<TWrapped> {
-  return {
-    type: 'non_nullable',
-    async: true,
-    wrapped,
-    message,
-    async _parse(input, info) {
-      // Allow `null` values not to pass
-      if (input === null) {
-        return schemaIssue(info, 'type', 'non_nullable', this.message, input);
-      }
-
-      // Return result of wrapped schema
-      return this.wrapped._parse(input, info);
-    },
-  };
-}
+export const nonNullableAsync = (
+  wrapped: BaseSchema | BaseSchemaAsync,
+  message?: ErrorMessage
+) => new NonNullableSchemaAsync(wrapped, message);

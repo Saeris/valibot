@@ -1,15 +1,22 @@
-import type { BaseSchema, ErrorMessage, Pipe } from '../../types/index.ts';
+import {
+  BaseSchema,
+  type ParseInfo,
+  type ErrorMessage,
+  type Pipe,
+} from '../../types/index.ts';
 import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 
 /**
  * String schema type.
  */
-export interface StringSchema<TOutput = string>
-  extends BaseSchema<string, TOutput> {
+export class StringSchema<TOutput = string> extends BaseSchema<
+  string,
+  TOutput
+> {
   /**
    * The schema type.
    */
-  type: 'string';
+  readonly type = 'string';
   /**
    * The error message.
    */
@@ -17,52 +24,49 @@ export interface StringSchema<TOutput = string>
   /**
    * The validation and transformation pipeline.
    */
-  pipe: Pipe<string> | undefined;
+  pipe?: Pipe<TOutput>;
+
+  constructor(arg1?: Pipe<TOutput> | ErrorMessage, arg2?: Pipe<TOutput>) {
+    super();
+    // Get message and pipe argument
+    const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
+    this.message = message;
+    this.pipe = pipe;
+  }
+
+  _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (typeof input !== 'string') {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Execute pipe and return result
+    return pipeResult(input as TOutput, this.pipe, info, this.type);
+  }
 }
 
-/**
- * Creates a string schema.
- *
- * @param pipe A validation and transformation pipe.
- *
- * @returns A string schema.
- */
-export function string(pipe?: Pipe<string>): StringSchema;
+export interface StringSchemaFactory {
+  /**
+   * Creates a string schema.
+   *
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns A string schema.
+   */
+  (pipe?: Pipe<string>): StringSchema;
 
-/**
- * Creates a string schema.
- *
- * @param message The error message.
- * @param pipe A validation and transformation pipe.
- *
- * @returns A string schema.
- */
-export function string(
-  message?: ErrorMessage,
-  pipe?: Pipe<string>
-): StringSchema;
+  /**
+   * Creates a string schema.
+   *
+   * @param message The error message.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns A string schema.
+   */
+  (message?: ErrorMessage, pipe?: Pipe<string>): StringSchema;
+}
 
-export function string(
-  arg1?: ErrorMessage | Pipe<string>,
+export const string: StringSchemaFactory = (
+  arg1?: Pipe<string> | ErrorMessage,
   arg2?: Pipe<string>
-): StringSchema {
-  // Get message and pipe argument
-  const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
-
-  // Create and return string schema
-  return {
-    type: 'string',
-    async: false,
-    message,
-    pipe,
-    _parse(input, info) {
-      // Check type of input
-      if (typeof input !== 'string') {
-        return schemaIssue(info, 'type', 'string', this.message, input);
-      }
-
-      // Execute pipe and return result
-      return pipeResult(input, this.pipe, info, 'string');
-    },
-  };
-}
+) => new StringSchema(arg1, arg2);

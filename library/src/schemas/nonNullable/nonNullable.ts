@@ -1,8 +1,9 @@
-import type {
+import {
   BaseSchema,
-  ErrorMessage,
-  Input,
-  Output,
+  type ParseInfo,
+  type ErrorMessage,
+  type Input,
+  type Output,
 } from '../../types/index.ts';
 import { schemaIssue } from '../../utils/index.ts';
 
@@ -14,14 +15,14 @@ export type NonNullable<T> = T extends null ? never : T;
 /**
  * Non nullable schema type.
  */
-export interface NonNullableSchema<
+export class NonNullableSchema<
   TWrapped extends BaseSchema,
   TOutput = NonNullable<Output<TWrapped>>
 > extends BaseSchema<NonNullable<Input<TWrapped>>, TOutput> {
   /**
    * The schema type.
    */
-  type: 'non_nullable';
+  readonly type = 'non_nullable';
   /**
    * The wrapped schema.
    */
@@ -30,6 +31,22 @@ export interface NonNullableSchema<
    * The error message.
    */
   message: ErrorMessage;
+
+  constructor(wrapped: TWrapped, message: ErrorMessage = 'Invalid type') {
+    super();
+    this.wrapped = wrapped;
+    this.message = message;
+  }
+
+  _parse(input: unknown, info?: ParseInfo) {
+    // Allow `null` values not to pass
+    if (input === null) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Return result of wrapped schema
+    return this.wrapped._parse(input, info);
+  }
 }
 
 /**
@@ -40,23 +57,5 @@ export interface NonNullableSchema<
  *
  * @returns A non nullable schema.
  */
-export function nonNullable<TWrapped extends BaseSchema>(
-  wrapped: TWrapped,
-  message: ErrorMessage = 'Invalid type'
-): NonNullableSchema<TWrapped> {
-  return {
-    type: 'non_nullable',
-    async: false,
-    wrapped,
-    message,
-    _parse(input, info) {
-      // Allow `null` values not to pass
-      if (input === null) {
-        return schemaIssue(info, 'type', 'non_nullable', this.message, input);
-      }
-
-      // Return result of wrapped schema
-      return this.wrapped._parse(input, info);
-    },
-  };
-}
+export const nonNullable = (wrapped: BaseSchema, message?: ErrorMessage) =>
+  new NonNullableSchema(wrapped, message);

@@ -1,15 +1,22 @@
-import type { BaseSchema, ErrorMessage, Pipe } from '../../types/index.ts';
+import {
+  BaseSchema,
+  type ParseInfo,
+  type ErrorMessage,
+  type Pipe,
+} from '../../types/index.ts';
 import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 
 /**
  * Number schema type.
  */
-export interface NumberSchema<TOutput = number>
-  extends BaseSchema<number, TOutput> {
+export class NumberSchema<TOutput = number> extends BaseSchema<
+  number,
+  TOutput
+> {
   /**
    * The schema type.
    */
-  type: 'number';
+  readonly type = 'number';
   /**
    * The error message.
    */
@@ -17,52 +24,49 @@ export interface NumberSchema<TOutput = number>
   /**
    * The validation and transformation pipeline.
    */
-  pipe: Pipe<number> | undefined;
+  pipe?: Pipe<TOutput>;
+
+  constructor(arg1?: ErrorMessage | Pipe<TOutput>, arg2?: Pipe<TOutput>) {
+    super();
+    // Get message and pipe argument
+    const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
+    this.message = message;
+    this.pipe = pipe;
+  }
+
+  _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (typeof input !== 'number' || isNaN(input)) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Execute pipe and return result
+    return pipeResult(input as TOutput, this.pipe, info, this.type);
+  }
 }
 
-/**
- * Creates a number schema.
- *
- * @param pipe A validation and transformation pipe.
- *
- * @returns A number schema.
- */
-export function number(pipe?: Pipe<number>): NumberSchema;
+export interface NumberSchemaFactory {
+  /**
+   * Creates a number schema.
+   *
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns A number schema.
+   */
+  (pipe?: Pipe<number>): NumberSchema;
 
-/**
- * Creates a number schema.
- *
- * @param message The error message.
- * @param pipe A validation and transformation pipe.
- *
- * @returns A number schema.
- */
-export function number(
-  message?: ErrorMessage,
-  pipe?: Pipe<number>
-): NumberSchema;
+  /**
+   * Creates a number schema.
+   *
+   * @param message The error message.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns A number schema.
+   */
+  (message?: ErrorMessage, pipe?: Pipe<number>): NumberSchema;
+}
 
-export function number(
+export const number: NumberSchemaFactory = (
   arg1?: ErrorMessage | Pipe<number>,
   arg2?: Pipe<number>
-): NumberSchema {
-  // Get message and pipe argument
-  const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
-
-  // Create and return number schema
-  return {
-    type: 'number',
-    async: false,
-    message,
-    pipe,
-    _parse(input, info) {
-      // Check type of input
-      if (typeof input !== 'number' || isNaN(input)) {
-        return schemaIssue(info, 'type', 'number', this.message, input);
-      }
-
-      // Execute pipe and return result
-      return pipeResult(input, this.pipe, info, 'number');
-    },
-  };
-}
+) => new NumberSchema(arg1, arg2);

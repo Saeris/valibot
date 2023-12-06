@@ -1,9 +1,10 @@
-import type {
-  BaseSchema,
+import {
+  type BaseSchema,
   BaseSchemaAsync,
-  ErrorMessage,
-  Input,
-  Output,
+  type ParseInfo,
+  type ErrorMessage,
+  type Input,
+  type Output,
 } from '../../types/index.ts';
 import { schemaIssue } from '../../utils/index.ts';
 import type { NonOptional } from './nonOptional.ts';
@@ -11,14 +12,14 @@ import type { NonOptional } from './nonOptional.ts';
 /**
  * Non optional schema async type.
  */
-export interface NonOptionalSchemaAsync<
+export class NonOptionalSchemaAsync<
   TWrapped extends BaseSchema | BaseSchemaAsync,
   TOutput = NonOptional<Output<TWrapped>>
 > extends BaseSchemaAsync<NonOptional<Input<TWrapped>>, TOutput> {
   /**
    * The schema type.
    */
-  type: 'non_optional';
+  readonly type = 'non_optional';
   /**
    * The wrapped schema.
    */
@@ -27,6 +28,22 @@ export interface NonOptionalSchemaAsync<
    * The error message.
    */
   message: ErrorMessage;
+
+  constructor(wrapped: TWrapped, message: ErrorMessage = 'Invalid type') {
+    super();
+    this.wrapped = wrapped;
+    this.message = message;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    // Allow `undefined` values not to pass
+    if (input === undefined) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Return result of wrapped schema
+    return this.wrapped._parse(input, info);
+  }
 }
 
 /**
@@ -37,23 +54,7 @@ export interface NonOptionalSchemaAsync<
  *
  * @returns An async non optional schema.
  */
-export function nonOptionalAsync<TWrapped extends BaseSchema | BaseSchemaAsync>(
-  wrapped: TWrapped,
-  message: ErrorMessage = 'Invalid type'
-): NonOptionalSchemaAsync<TWrapped> {
-  return {
-    type: 'non_optional',
-    async: true,
-    wrapped,
-    message,
-    async _parse(input, info) {
-      // Allow `undefined` values not to pass
-      if (input === undefined) {
-        return schemaIssue(info, 'type', 'non_optional', this.message, input);
-      }
-
-      // Return result of wrapped schema
-      return this.wrapped._parse(input, info);
-    },
-  };
-}
+export const nonOptionalAsync = (
+  wrapped: BaseSchema | BaseSchemaAsync,
+  message?: ErrorMessage
+) => new NonOptionalSchemaAsync(wrapped, message);

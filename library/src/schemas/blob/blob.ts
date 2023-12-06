@@ -1,14 +1,19 @@
-import type { BaseSchema, ErrorMessage, Pipe } from '../../types/index.ts';
+import {
+  BaseSchema,
+  type ParseInfo,
+  type ErrorMessage,
+  type Pipe,
+} from '../../types/index.ts';
 import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 
 /**
  * Blob schema type.
  */
-export interface BlobSchema<TOutput = Blob> extends BaseSchema<Blob, TOutput> {
+export class BlobSchema<TOutput = Blob> extends BaseSchema<Blob, TOutput> {
   /**
    * The schema type.
    */
-  type: 'blob';
+  readonly type = 'blob';
   /**
    * The error message.
    */
@@ -16,49 +21,49 @@ export interface BlobSchema<TOutput = Blob> extends BaseSchema<Blob, TOutput> {
   /**
    * The validation and transformation pipeline.
    */
-  pipe: Pipe<Blob> | undefined;
+  pipe?: Pipe<TOutput>;
+
+  constructor(arg1?: ErrorMessage | Pipe<TOutput>, arg2?: Pipe<TOutput>) {
+    super();
+    // Get message and pipe argument
+    const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
+    this.message = message;
+    this.pipe = pipe;
+  }
+
+  _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (!(input instanceof Blob)) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Execute pipe and return result
+    return pipeResult(input as TOutput, this.pipe, info, this.type);
+  }
 }
 
-/**
- * Creates a blob schema.
- *
- * @param pipe A validation and transformation pipe.
- *
- * @returns A blob schema.
- */
-export function blob(pipe?: Pipe<Blob>): BlobSchema;
+export interface BlobSchemaFactory {
+  /**
+   * Creates a blob schema.
+   *
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns A blob schema.
+   */
+  (pipe?: Pipe<Blob>): BlobSchema;
 
-/**
- * Creates a blob schema.
- *
- * @param message The error message.
- * @param pipe A validation and transformation pipe.
- *
- * @returns A blob schema.
- */
-export function blob(message?: ErrorMessage, pipe?: Pipe<Blob>): BlobSchema;
+  /**
+   * Creates a blob schema.
+   *
+   * @param message The error message.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns A blob schema.
+   */
+  (message?: ErrorMessage, pipe?: Pipe<Blob>): BlobSchema;
+}
 
-export function blob(
+export const blob: BlobSchemaFactory = (
   arg1?: ErrorMessage | Pipe<Blob>,
   arg2?: Pipe<Blob>
-): BlobSchema {
-  // Get message and pipe argument
-  const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
-
-  // Create and return blob schema
-  return {
-    type: 'blob',
-    async: false,
-    message,
-    pipe,
-    _parse(input, info) {
-      // Check type of input
-      if (!(input instanceof Blob)) {
-        return schemaIssue(info, 'type', 'blob', this.message, input);
-      }
-
-      // Execute pipe and return result
-      return pipeResult(input, this.pipe, info, 'blob');
-    },
-  };
-}
+) => new BlobSchema(arg1, arg2);

@@ -1,19 +1,40 @@
-import type { BaseSchemaAsync, ErrorMessage } from '../../types/index.ts';
+import {
+  BaseSchemaAsync,
+  type ParseInfo,
+  type ErrorMessage,
+} from '../../types/index.ts';
 import { parseResult, schemaIssue } from '../../utils/index.ts';
 
 /**
  * Undefined schema async type.
  */
-export interface UndefinedSchemaAsync<TOutput = undefined>
-  extends BaseSchemaAsync<undefined, TOutput> {
+export class UndefinedSchemaAsync<TOutput = undefined> extends BaseSchemaAsync<
+  undefined,
+  TOutput
+> {
   /**
    * The schema type.
    */
-  type: 'undefined';
+  readonly type = 'undefined';
   /**
    * The error message.
    */
   message: ErrorMessage;
+
+  constructor(message: ErrorMessage = 'Invalid type') {
+    super();
+    this.message = message;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (typeof input !== 'undefined') {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Return parse result
+    return parseResult(true, input as TOutput);
+  }
 }
 
 /**
@@ -23,24 +44,8 @@ export interface UndefinedSchemaAsync<TOutput = undefined>
  *
  * @returns An async undefined schema.
  */
-export function undefinedAsync(
-  message: ErrorMessage = 'Invalid type'
-): UndefinedSchemaAsync {
-  return {
-    type: 'undefined',
-    async: true,
-    message,
-    async _parse(input, info) {
-      // Check type of input
-      if (typeof input !== 'undefined') {
-        return schemaIssue(info, 'type', 'undefined', this.message, input);
-      }
-
-      // Return parse result
-      return parseResult(true, input);
-    },
-  };
-}
+export const undefinedAsync = (message?: ErrorMessage) =>
+  new UndefinedSchemaAsync(message);
 
 /**
  * See {@link undefinedAsync}

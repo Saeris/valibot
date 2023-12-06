@@ -1,19 +1,34 @@
-import type { BaseSchemaAsync, PipeAsync } from '../../types/index.ts';
+import {
+  BaseSchemaAsync,
+  type PipeAsync,
+  type ParseInfo,
+} from '../../types/index.ts';
 import { pipeResultAsync } from '../../utils/index.ts';
 
 /**
  * Any schema type.
  */
-export interface AnySchemaAsync<TOutput = any>
-  extends BaseSchemaAsync<any, TOutput> {
+export class AnySchemaAsync<TOutput = any> extends BaseSchemaAsync<
+  any,
+  TOutput
+> {
   /**
    * The schema type.
    */
-  type: 'any';
+  readonly type = 'any';
   /**
    * The validation and transformation pipeline.
    */
-  pipe: PipeAsync<any> | undefined;
+  pipe?: PipeAsync<any>;
+
+  constructor(pipe?: PipeAsync<any>) {
+    super();
+    this.pipe = pipe;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    return pipeResultAsync(input, this.pipe, info, this.type);
+  }
 }
 
 /**
@@ -23,13 +38,4 @@ export interface AnySchemaAsync<TOutput = any>
  *
  * @returns An async any schema.
  */
-export function anyAsync(pipe?: PipeAsync<any>): AnySchemaAsync {
-  return {
-    type: 'any',
-    async: true,
-    pipe,
-    async _parse(input, info) {
-      return pipeResultAsync(input, this.pipe, info, 'any');
-    },
-  };
-}
+export const anyAsync = (pipe?: PipeAsync<any>) => new AnySchemaAsync(pipe);

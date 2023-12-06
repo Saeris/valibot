@@ -51,17 +51,40 @@ export type SchemaResult<TOutput> =
   | UntypedSchemaResult;
 
 /**
- * Base schema type.
+ * Root Schema type from which all Schemas are assignable to
  */
-export interface BaseSchema<TInput = any, TOutput = TInput> {
+export abstract class Schema<TInput = any, TOutput = TInput> {
   /**
    * The schema type.
    */
-  type: string;
+  abstract type: string;
   /**
    * Whether it's async.
    */
-  async: false;
+  abstract async: boolean;
+  /**
+   * Input and output type.
+   *
+   * @internal
+   */
+  _types?: { input: TInput; output: TOutput };
+}
+
+/**
+ * Base schema type.
+ */
+export abstract class BaseSchema<TInput = any, TOutput = TInput> extends Schema<
+  TInput,
+  TOutput
+> {
+  /**
+   * The schema type.
+   */
+  abstract type: string;
+  /**
+   * Whether it's async.
+   */
+  readonly async = false;
   /**
    * Parses unknown input based on its schema.
    *
@@ -72,27 +95,24 @@ export interface BaseSchema<TInput = any, TOutput = TInput> {
    *
    * @internal
    */
-  _parse(input: unknown, info?: ParseInfo): SchemaResult<TOutput>;
-  /**
-   * Input and output type.
-   *
-   * @internal
-   */
-  _types?: { input: TInput; output: TOutput };
+  abstract _parse(input: unknown, info?: ParseInfo): SchemaResult<TOutput>;
 }
 
 /**
  * Base schema async type.
  */
-export interface BaseSchemaAsync<TInput = any, TOutput = TInput> {
+export abstract class BaseSchemaAsync<
+  TInput = any,
+  TOutput = TInput
+> extends Schema<TInput, TOutput> {
   /**
    * The schema type.
    */
-  type: string;
+  abstract type: string;
   /**
    * Whether it's async.
    */
-  async: true;
+  readonly async = true;
   /**
    * Parses unknown input based on its schema.
    *
@@ -103,25 +123,22 @@ export interface BaseSchemaAsync<TInput = any, TOutput = TInput> {
    *
    * @internal
    */
-  _parse(input: unknown, info?: ParseInfo): Promise<SchemaResult<TOutput>>;
-  /**
-   * Input and output type.
-   *
-   * @internal
-   */
-  _types?: { input: TInput; output: TOutput };
+  abstract _parse(
+    input: unknown,
+    info?: ParseInfo
+  ): Promise<SchemaResult<TOutput>>;
 }
 
 /**
  * Input inference type.
  */
-export type Input<TSchema extends BaseSchema | BaseSchemaAsync> = NonNullable<
+export type Input<TSchema extends Schema> = NonNullable<
   TSchema['_types']
 >['input'];
 
 /**
  * Output inference type.
  */
-export type Output<TSchema extends BaseSchema | BaseSchemaAsync> = NonNullable<
+export type Output<TSchema extends Schema> = NonNullable<
   TSchema['_types']
 >['output'];

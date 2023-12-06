@@ -1,20 +1,34 @@
-import type { BaseSchema, Input, Output } from '../../types/index.ts';
+import {
+  BaseSchema,
+  type ParseInfo,
+  type Input,
+  type Output,
+} from '../../types/index.ts';
 
 /**
  * Recursive schema type.
  */
-export interface RecursiveSchema<
+export class RecursiveSchema<
   TSchemaGetter extends () => BaseSchema,
   TOutput = Output<ReturnType<TSchemaGetter>>
 > extends BaseSchema<Input<ReturnType<TSchemaGetter>>, TOutput> {
   /**
    * The schema type.
    */
-  type: 'recursive';
+  readonly type = 'recursive';
   /**
    * The schema getter.
    */
   getter: TSchemaGetter;
+
+  constructor(getter: TSchemaGetter) {
+    super();
+    this.getter = getter;
+  }
+
+  _parse(input: unknown, info?: ParseInfo) {
+    return this.getter()._parse(input, info);
+  }
 }
 
 /**
@@ -24,15 +38,6 @@ export interface RecursiveSchema<
  *
  * @returns A recursive schema.
  */
-export function recursive<TSchemaGetter extends () => BaseSchema>(
+export const recursive = <TSchemaGetter extends () => BaseSchema>(
   getter: TSchemaGetter
-): RecursiveSchema<TSchemaGetter> {
-  return {
-    type: 'recursive',
-    async: false,
-    getter,
-    _parse(input, info) {
-      return this.getter()._parse(input, info);
-    },
-  };
-}
+) => new RecursiveSchema(getter);

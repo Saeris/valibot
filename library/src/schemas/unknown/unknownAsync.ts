@@ -1,19 +1,34 @@
-import type { BaseSchemaAsync, PipeAsync } from '../../types/index.ts';
+import {
+  BaseSchemaAsync,
+  type ParseInfo,
+  type PipeAsync,
+} from '../../types/index.ts';
 import { pipeResultAsync } from '../../utils/index.ts';
 
 /**
  * Unknown schema async type.
  */
-export interface UnknownSchemaAsync<TOutput = unknown>
-  extends BaseSchemaAsync<unknown, TOutput> {
+export class UnknownSchemaAsync<TOutput = unknown> extends BaseSchemaAsync<
+  unknown,
+  TOutput
+> {
   /**
    * The schema type.
    */
-  type: 'unknown';
+  readonly type = 'unknown';
   /**
    * The validation and transformation pipeline.
    */
-  pipe: PipeAsync<unknown> | undefined;
+  pipe?: PipeAsync<TOutput>;
+
+  constructor(pipe?: PipeAsync<TOutput>) {
+    super();
+    this.pipe = pipe;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    return pipeResultAsync(input as TOutput, this.pipe, info, this.type);
+  }
 }
 
 /**
@@ -23,13 +38,5 @@ export interface UnknownSchemaAsync<TOutput = unknown>
  *
  * @returns An async unknown schema.
  */
-export function unknownAsync(pipe?: PipeAsync<unknown>): UnknownSchemaAsync {
-  return {
-    type: 'unknown',
-    async: true,
-    pipe,
-    async _parse(input, info) {
-      return pipeResultAsync(input, this.pipe, info, 'unknown');
-    },
-  };
-}
+export const unknownAsync = (pipe?: PipeAsync<unknown>) =>
+  new UnknownSchemaAsync(pipe);

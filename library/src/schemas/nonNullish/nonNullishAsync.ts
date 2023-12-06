@@ -1,9 +1,10 @@
-import type {
-  BaseSchema,
+import {
+  type BaseSchema,
   BaseSchemaAsync,
-  ErrorMessage,
-  Input,
-  Output,
+  type ParseInfo,
+  type ErrorMessage,
+  type Input,
+  type Output,
 } from '../../types/index.ts';
 import { schemaIssue } from '../../utils/index.ts';
 import type { NonNullish } from './nonNullish.ts';
@@ -11,14 +12,14 @@ import type { NonNullish } from './nonNullish.ts';
 /**
  * Non nullish schema async type.
  */
-export interface NonNullishSchemaAsync<
+export class NonNullishSchemaAsync<
   TWrapped extends BaseSchema | BaseSchemaAsync,
   TOutput = NonNullish<Output<TWrapped>>
 > extends BaseSchemaAsync<NonNullish<Input<TWrapped>>, TOutput> {
   /**
    * The schema type.
    */
-  type: 'non_nullish';
+  readonly type = 'non_nullish';
   /**
    * The wrapped schema.
    */
@@ -27,6 +28,22 @@ export interface NonNullishSchemaAsync<
    * The error message.
    */
   message: ErrorMessage;
+
+  constructor(wrapped: TWrapped, message: ErrorMessage = 'Invalid type') {
+    super();
+    this.wrapped = wrapped;
+    this.message = message;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    // Allow `null` and `undefined` values not to pass
+    if (input === null || input === undefined) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Return result of wrapped schema
+    return this.wrapped._parse(input, info);
+  }
 }
 
 /**
@@ -37,23 +54,7 @@ export interface NonNullishSchemaAsync<
  *
  * @returns An async non nullish schema.
  */
-export function nonNullishAsync<TWrapped extends BaseSchema | BaseSchemaAsync>(
-  wrapped: TWrapped,
-  message: ErrorMessage = 'Invalid type'
-): NonNullishSchemaAsync<TWrapped> {
-  return {
-    type: 'non_nullish',
-    async: true,
-    wrapped,
-    message,
-    async _parse(input, info) {
-      // Allow `null` and `undefined` values not to pass
-      if (input === null || input === undefined) {
-        return schemaIssue(info, 'type', 'non_nullish', this.message, input);
-      }
-
-      // Return result of wrapped schema
-      return this.wrapped._parse(input, info);
-    },
-  };
-}
+export const nonNullishAsync = (
+  wrapped: BaseSchema | BaseSchemaAsync,
+  message?: ErrorMessage
+) => new NonNullishSchemaAsync(wrapped, message);

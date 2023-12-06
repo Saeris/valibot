@@ -1,9 +1,10 @@
-import type {
-  BaseSchema,
+import {
+  type BaseSchema,
   BaseSchemaAsync,
-  ErrorMessage,
-  Issues,
-  PipeAsync,
+  type ParseInfo,
+  type ErrorMessage,
+  type Issues,
+  type PipeAsync,
 } from '../../types/index.ts';
 import {
   defaultArgs,
@@ -16,14 +17,14 @@ import type { SetInput, SetOutput, SetPathItem } from './types.ts';
 /**
  * Set schema async type.
  */
-export interface SetSchemaAsync<
+export class SetSchemaAsync<
   TValue extends BaseSchema | BaseSchemaAsync,
   TOutput = SetOutput<TValue>
 > extends BaseSchemaAsync<SetInput<TValue>, TOutput> {
   /**
    * The schema type.
    */
-  type: 'set';
+  readonly type = 'set';
   /**
    * The set value schema.
    */
@@ -35,122 +36,135 @@ export interface SetSchemaAsync<
   /**
    * The validation and transformation pipeline.
    */
-  pipe: PipeAsync<SetOutput<TValue>> | undefined;
-}
+  pipe?: PipeAsync<TOutput>;
 
-/**
- * Creates an async set schema.
- *
- * @param value The value schema.
- * @param pipe A validation and transformation pipe.
- *
- * @returns An async set schema.
- */
-export function setAsync<TValue extends BaseSchema | BaseSchemaAsync>(
-  value: TValue,
-  pipe?: PipeAsync<SetOutput<TValue>>
-): SetSchemaAsync<TValue>;
+  constructor(
+    value: TValue,
+    arg2?: PipeAsync<TOutput> | ErrorMessage,
+    arg3?: PipeAsync<TOutput>
+  ) {
+    super();
+    // Get message and pipe argument
+    const [message = 'Invalid type', pipe] = defaultArgs(arg2, arg3);
+    this.value = value;
+    this.message = message;
+    this.pipe = pipe;
+  }
 
-/**
- * Creates an async set schema.
- *
- * @param value The value schema.
- * @param message The error message.
- * @param pipe A validation and transformation pipe.
- *
- * @returns An async set schema.
- */
-export function setAsync<TValue extends BaseSchema | BaseSchemaAsync>(
-  value: TValue,
-  message?: ErrorMessage,
-  pipe?: PipeAsync<SetOutput<TValue>>
-): SetSchemaAsync<TValue>;
+  async _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (!(input instanceof Set)) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
 
-export function setAsync<TValue extends BaseSchema | BaseSchemaAsync>(
-  value: TValue,
-  arg2?: PipeAsync<SetOutput<TValue>> | ErrorMessage,
-  arg3?: PipeAsync<SetOutput<TValue>>
-): SetSchemaAsync<TValue> {
-  // Get message and pipe argument
-  const [message = 'Invalid type', pipe] = defaultArgs(arg2, arg3);
+    // Create typed, index, output and issues
+    let typed = true;
+    let issues: Issues | undefined;
+    const output: SetOutput<TValue> = new Set();
 
-  // Create and return async set schema
-  return {
-    type: 'set',
-    async: true,
-    value,
-    message,
-    pipe,
-    async _parse(input, info) {
-      // Check type of input
-      if (!(input instanceof Set)) {
-        return schemaIssue(info, 'type', 'set', this.message, input);
-      }
+    // Parse each value by schema
+    await Promise.all(
+      Array.from(input.values()).map(async (inputValue, key) => {
+        // If not aborted early, continue execution
+        if (!(info?.abortEarly && issues)) {
+          // Get parse result of input value
+          const result = await this.value._parse(inputValue, info);
 
-      // Create typed, index, output and issues
-      let typed = true;
-      let issues: Issues | undefined;
-      const output: SetOutput<TValue> = new Set();
-
-      // Parse each value by schema
-      await Promise.all(
-        Array.from(input.values()).map(async (inputValue, key) => {
           // If not aborted early, continue execution
           if (!(info?.abortEarly && issues)) {
-            // Get parse result of input value
-            const result = await this.value._parse(inputValue, info);
+            // If there are issues, capture them
+            if (result.issues) {
+              // Create set path item
+              const pathItem: SetPathItem = {
+                type: 'set',
+                input,
+                key,
+                value: inputValue,
+              };
 
-            // If not aborted early, continue execution
-            if (!(info?.abortEarly && issues)) {
-              // If there are issues, capture them
-              if (result.issues) {
-                // Create set path item
-                const pathItem: SetPathItem = {
-                  type: 'set',
-                  input,
-                  key,
-                  value: inputValue,
-                };
-
-                // Add modified result issues to issues
-                for (const issue of result.issues) {
-                  if (issue.path) {
-                    issue.path.unshift(pathItem);
-                  } else {
-                    issue.path = [pathItem];
-                  }
-                  issues?.push(issue);
+              // Add modified result issues to issues
+              for (const issue of result.issues) {
+                if (issue.path) {
+                  issue.path.unshift(pathItem);
+                } else {
+                  issue.path = [pathItem];
                 }
-                if (!issues) {
-                  issues = result.issues;
-                }
-
-                // If necessary, abort early
-                if (info?.abortEarly) {
-                  typed = false;
-                  throw null;
-                }
+                issues?.push(issue);
+              }
+              if (!issues) {
+                issues = result.issues;
               }
 
-              // If not typed, set typed to false
-              if (!result.typed) {
+              // If necessary, abort early
+              if (info?.abortEarly) {
                 typed = false;
+                throw null;
               }
-
-              // Set output of entry if necessary
-              output.add(result.output);
             }
+
+            // If not typed, set typed to false
+            if (!result.typed) {
+              typed = false;
+            }
+
+            // Set output of entry if necessary
+            output.add(result.output);
           }
-        })
-      ).catch(() => null);
+        }
+      })
+    ).catch(() => null);
 
-      // If output is typed, execute pipe
-      if (typed) {
-        return pipeResultAsync(output, this.pipe, info, 'set', issues);
-      }
+    // If output is typed, execute pipe
+    if (typed) {
+      return pipeResultAsync(
+        output as TOutput,
+        this.pipe,
+        info,
+        this.type,
+        issues
+      );
+    }
 
-      // Otherwise, return untyped parse result
-      return parseResult(false, output, issues as Issues);
-    },
-  };
+    // Otherwise, return untyped parse result
+    return parseResult(false, output, issues as Issues);
+  }
 }
+
+export interface SetSchemaAsyncFactory {
+  /**
+   * Creates an async set schema.
+   *
+   * @param value The value schema.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns An async set schema.
+   */
+  <TValue extends BaseSchema | BaseSchemaAsync>(
+    value: TValue,
+    pipe?: PipeAsync<SetOutput<TValue>>
+  ): SetSchemaAsync<TValue>;
+
+  /**
+   * Creates an async set schema.
+   *
+   * @param value The value schema.
+   * @param message The error message.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns An async set schema.
+   */
+  <TValue extends BaseSchema | BaseSchemaAsync>(
+    value: TValue,
+    message?: ErrorMessage,
+    pipe?: PipeAsync<SetOutput<TValue>>
+  ): SetSchemaAsync<TValue>;
+}
+
+export const setAsync: SetSchemaAsyncFactory = <
+  TValue extends BaseSchema | BaseSchemaAsync,
+  TOutput = SetOutput<TValue>
+>(
+  value: TValue,
+  arg2?: PipeAsync<TOutput> | ErrorMessage,
+  arg3?: PipeAsync<TOutput>
+) => new SetSchemaAsync(value, arg2, arg3);

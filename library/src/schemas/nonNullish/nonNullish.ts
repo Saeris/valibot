@@ -1,8 +1,9 @@
-import type {
+import {
   BaseSchema,
-  ErrorMessage,
-  Input,
-  Output,
+  type ParseInfo,
+  type ErrorMessage,
+  type Input,
+  type Output,
 } from '../../types/index.ts';
 import { schemaIssue } from '../../utils/index.ts';
 
@@ -14,14 +15,14 @@ export type NonNullish<T> = T extends null | undefined ? never : T;
 /**
  * Non nullish schema type.
  */
-export interface NonNullishSchema<
+export class NonNullishSchema<
   TWrapped extends BaseSchema,
   TOutput = NonNullish<Output<TWrapped>>
 > extends BaseSchema<NonNullish<Input<TWrapped>>, TOutput> {
   /**
    * The schema type.
    */
-  type: 'non_nullish';
+  readonly type = 'non_nullish';
   /**
    * The wrapped schema.
    */
@@ -30,6 +31,22 @@ export interface NonNullishSchema<
    * The error message.
    */
   message: ErrorMessage;
+
+  constructor(wrapped: TWrapped, message: ErrorMessage = 'Invalid type') {
+    super();
+    this.wrapped = wrapped;
+    this.message = message;
+  }
+
+  _parse(input: unknown, info?: ParseInfo) {
+    // Allow `null` and `undefined` values not to pass
+    if (input === null || input === undefined) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Return result of wrapped schema
+    return this.wrapped._parse(input, info);
+  }
 }
 
 /**
@@ -40,23 +57,5 @@ export interface NonNullishSchema<
  *
  * @returns A non nullish schema.
  */
-export function nonNullish<TWrapped extends BaseSchema>(
-  wrapped: TWrapped,
-  message: ErrorMessage = 'Invalid type'
-): NonNullishSchema<TWrapped> {
-  return {
-    type: 'non_nullish',
-    async: false,
-    wrapped,
-    message,
-    _parse(input, info) {
-      // Allow `null` and `undefined` values not to pass
-      if (input === null || input === undefined) {
-        return schemaIssue(info, 'type', 'non_nullish', this.message, input);
-      }
-
-      // Return result of wrapped schema
-      return this.wrapped._parse(input, info);
-    },
-  };
-}
+export const nonNullish = (wrapped: BaseSchema, message?: ErrorMessage) =>
+  new NonNullishSchema(wrapped, message);

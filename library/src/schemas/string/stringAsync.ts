@@ -1,7 +1,8 @@
-import type {
+import {
   BaseSchemaAsync,
-  ErrorMessage,
-  PipeAsync,
+  type ParseInfo,
+  type ErrorMessage,
+  type PipeAsync,
 } from '../../types/index.ts';
 import {
   defaultArgs,
@@ -12,12 +13,14 @@ import {
 /**
  * String schema async type.
  */
-export interface StringSchemaAsync<TOutput = string>
-  extends BaseSchemaAsync<string, TOutput> {
+export class StringSchemaAsync<TOutput = string> extends BaseSchemaAsync<
+  string,
+  TOutput
+> {
   /**
    * The schema type.
    */
-  type: 'string';
+  readonly type = 'string';
   /**
    * The error message.
    */
@@ -25,52 +28,52 @@ export interface StringSchemaAsync<TOutput = string>
   /**
    * The validation and transformation pipeline.
    */
-  pipe: PipeAsync<string> | undefined;
+  pipe?: PipeAsync<TOutput>;
+
+  constructor(
+    arg1?: PipeAsync<TOutput> | ErrorMessage,
+    arg2?: PipeAsync<TOutput>
+  ) {
+    super();
+    // Get message and pipe argument
+    const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
+    this.message = message;
+    this.pipe = pipe;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (typeof input !== 'string') {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Execute pipe and return result
+    return pipeResultAsync(input as TOutput, this.pipe, info, this.type);
+  }
 }
 
-/**
- * Creates an async string schema.
- *
- * @param pipe A validation and transformation pipe.
- *
- * @returns An async string schema.
- */
-export function stringAsync(pipe?: PipeAsync<string>): StringSchemaAsync;
+export interface StringSchemaAsyncFactory {
+  /**
+   * Creates an async string schema.
+   *
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns An async string schema.
+   */
+  (pipe?: PipeAsync<string>): StringSchemaAsync;
 
-/**
- * Creates an async string schema.
- *
- * @param message The error message.
- * @param pipe A validation and transformation pipe.
- *
- * @returns An async string schema.
- */
-export function stringAsync(
-  message?: ErrorMessage,
-  pipe?: PipeAsync<string>
-): StringSchemaAsync;
+  /**
+   * Creates an async string schema.
+   *
+   * @param message The error message.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns An async string schema.
+   */
+  (message?: ErrorMessage, pipe?: PipeAsync<string>): StringSchemaAsync;
+}
 
-export function stringAsync(
-  arg1?: ErrorMessage | PipeAsync<string>,
+export const stringAsync: StringSchemaAsyncFactory = (
+  arg1?: PipeAsync<string> | ErrorMessage,
   arg2?: PipeAsync<string>
-): StringSchemaAsync {
-  // Get message and pipe argument
-  const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
-
-  // Create and return async string schema
-  return {
-    type: 'string',
-    async: true,
-    message,
-    pipe,
-    async _parse(input, info) {
-      // Check type of input
-      if (typeof input !== 'string') {
-        return schemaIssue(info, 'type', 'string', this.message, input);
-      }
-
-      // Execute pipe and return result
-      return pipeResultAsync(input, this.pipe, info, 'string');
-    },
-  };
-}
+) => new StringSchemaAsync(arg1, arg2);

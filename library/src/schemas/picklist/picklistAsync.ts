@@ -1,18 +1,22 @@
-import type { BaseSchemaAsync, ErrorMessage } from '../../types/index.ts';
+import {
+  BaseSchemaAsync,
+  type ParseInfo,
+  type ErrorMessage,
+} from '../../types/index.ts';
 import { parseResult, schemaIssue } from '../../utils/index.ts';
 import type { PicklistOptions } from './types.ts';
 
 /**
  * Picklist schema async type.
  */
-export interface PicklistSchemaAsync<
+export class PicklistSchemaAsync<
   TOptions extends PicklistOptions,
   TOutput = TOptions[number]
 > extends BaseSchemaAsync<TOptions[number], TOutput> {
   /**
    * The schema type.
    */
-  type: 'picklist';
+  readonly type = 'picklist';
   /**
    * The picklist value.
    */
@@ -21,6 +25,22 @@ export interface PicklistSchemaAsync<
    * The error message.
    */
   message: ErrorMessage;
+
+  constructor(options: TOptions, message: ErrorMessage = 'Invalid type') {
+    super();
+    this.options = options;
+    this.message = message;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (!this.options.includes(input as any)) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Return inpot as output
+    return parseResult(true, input as TOutput);
+  }
 }
 
 /**
@@ -31,29 +51,13 @@ export interface PicklistSchemaAsync<
  *
  * @returns An async picklist schema.
  */
-export function picklistAsync<
+export const picklistAsync = <
   TOption extends string,
   TOptions extends PicklistOptions<TOption>
 >(
   options: TOptions,
-  message: ErrorMessage = 'Invalid type'
-): PicklistSchemaAsync<TOptions> {
-  return {
-    type: 'picklist',
-    async: true,
-    options,
-    message,
-    async _parse(input, info) {
-      // Check type of input
-      if (!this.options.includes(input as any)) {
-        return schemaIssue(info, 'type', 'picklist', this.message, input);
-      }
-
-      // Return inpot as output
-      return parseResult(true, input as TOptions[number]);
-    },
-  };
-}
+  message?: ErrorMessage
+) => new PicklistSchemaAsync(options, message);
 
 /**
  * See {@link picklistAsync}

@@ -1,7 +1,8 @@
-import type {
+import {
   BaseSchemaAsync,
-  ErrorMessage,
-  PipeAsync,
+  type ParseInfo,
+  type ErrorMessage,
+  type PipeAsync,
 } from '../../types/index.ts';
 import {
   defaultArgs,
@@ -12,12 +13,14 @@ import {
 /**
  * Boolean schema async type.
  */
-export interface BooleanSchemaAsync<TOutput = boolean>
-  extends BaseSchemaAsync<boolean, TOutput> {
+export class BooleanSchemaAsync<TOutput = boolean> extends BaseSchemaAsync<
+  boolean,
+  TOutput
+> {
   /**
    * The schema type.
    */
-  type: 'boolean';
+  readonly type = 'boolean';
   /**
    * The error message.
    */
@@ -25,52 +28,52 @@ export interface BooleanSchemaAsync<TOutput = boolean>
   /**
    * The validation and transformation pipeline.
    */
-  pipe: PipeAsync<boolean> | undefined;
+  pipe?: PipeAsync<TOutput>;
+
+  constructor(
+    arg1?: ErrorMessage | PipeAsync<TOutput>,
+    arg2?: PipeAsync<TOutput>
+  ) {
+    super();
+    // Get message and pipe argument
+    const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
+    this.message = message;
+    this.pipe = pipe;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (typeof input !== 'boolean') {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Execute pipe and return result
+    return pipeResultAsync(input as TOutput, this.pipe, info, this.type);
+  }
 }
 
-/**
- * Creates an async boolean schema.
- *
- * @param pipe A validation and transformation pipe.
- *
- * @returns An async boolean schema.
- */
-export function booleanAsync(pipe?: PipeAsync<boolean>): BooleanSchemaAsync;
+export interface BooleanSchemaAsyncFactory {
+  /**
+   * Creates an async boolean schema.
+   *
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns An async boolean schema.
+   */
+  (pipe?: PipeAsync<boolean>): BooleanSchemaAsync;
 
-/**
- * Creates an async boolean schema.
- *
- * @param message The error message.
- * @param pipe A validation and transformation pipe.
- *
- * @returns An async boolean schema.
- */
-export function booleanAsync(
-  message?: ErrorMessage,
-  pipe?: PipeAsync<boolean>
-): BooleanSchemaAsync;
+  /**
+   * Creates an async boolean schema.
+   *
+   * @param message The error message.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns An async boolean schema.
+   */
+  (message?: ErrorMessage, pipe?: PipeAsync<boolean>): BooleanSchemaAsync;
+}
 
-export function booleanAsync(
+export const booleanAsync: BooleanSchemaAsyncFactory = (
   arg1?: ErrorMessage | PipeAsync<boolean>,
   arg2?: PipeAsync<boolean>
-): BooleanSchemaAsync {
-  // Get message and pipe argument
-  const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
-
-  // Create and return async boolean schema
-  return {
-    type: 'boolean',
-    async: true,
-    message,
-    pipe,
-    async _parse(input, info) {
-      // Check type of input
-      if (typeof input !== 'boolean') {
-        return schemaIssue(info, 'type', 'boolean', this.message, input);
-      }
-
-      // Execute pipe and return result
-      return pipeResultAsync(input, this.pipe, info, 'boolean');
-    },
-  };
-}
+) => new BooleanSchemaAsync(arg1, arg2);

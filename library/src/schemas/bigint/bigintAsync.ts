@@ -1,7 +1,8 @@
-import type {
+import {
   BaseSchemaAsync,
-  ErrorMessage,
-  PipeAsync,
+  type ParseInfo,
+  type ErrorMessage,
+  type PipeAsync,
 } from '../../types/index.ts';
 import {
   defaultArgs,
@@ -12,12 +13,14 @@ import {
 /**
  * Bigint schema async type.
  */
-export interface BigintSchemaAsync<TOutput = bigint>
-  extends BaseSchemaAsync<bigint, TOutput> {
+export class BigintSchemaAsync<TOutput = bigint> extends BaseSchemaAsync<
+  bigint,
+  TOutput
+> {
   /**
    * The schema type.
    */
-  type: 'bigint';
+  readonly type = 'bigint';
   /**
    * The error message.
    */
@@ -25,52 +28,52 @@ export interface BigintSchemaAsync<TOutput = bigint>
   /**
    * The validation and transformation pipeline.
    */
-  pipe: PipeAsync<bigint> | undefined;
+  pipe?: PipeAsync<TOutput>;
+
+  constructor(
+    arg1?: ErrorMessage | PipeAsync<TOutput>,
+    arg2?: PipeAsync<TOutput>
+  ) {
+    super();
+    // Get message and pipe argument
+    const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
+    this.message = message;
+    this.pipe = pipe;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (typeof input !== 'bigint') {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Execute pipe and return result
+    return pipeResultAsync(input as TOutput, this.pipe, info, this.type);
+  }
 }
 
-/**
- * Creates an async bigint schema.
- *
- * @param pipe A validation and transformation pipe.
- *
- * @returns An async bigint schema.
- */
-export function bigintAsync(pipe?: PipeAsync<bigint>): BigintSchemaAsync;
+export interface BigintSchemaAsyncFactory {
+  /**
+   * Creates an async bigint schema.
+   *
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns An async bigint schema.
+   */
+  (pipe?: PipeAsync<bigint>): BigintSchemaAsync;
 
-/**
- * Creates an async bigint schema.
- *
- * @param message The error message.
- * @param pipe A validation and transformation pipe.
- *
- * @returns An async bigint schema.
- */
-export function bigintAsync(
-  message?: ErrorMessage,
-  pipe?: PipeAsync<bigint>
-): BigintSchemaAsync;
+  /**
+   * Creates an async bigint schema.
+   *
+   * @param message The error message.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns An async bigint schema.
+   */
+  (message?: ErrorMessage, pipe?: PipeAsync<bigint>): BigintSchemaAsync;
+}
 
-export function bigintAsync(
+export const bigintAsync: BigintSchemaAsyncFactory = (
   arg1?: ErrorMessage | PipeAsync<bigint>,
   arg2?: PipeAsync<bigint>
-): BigintSchemaAsync {
-  // Get message and pipe argument
-  const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
-
-  // Create and return async bigint schema
-  return {
-    type: 'bigint',
-    async: true,
-    message,
-    pipe,
-    async _parse(input, info) {
-      // Check type of input
-      if (typeof input !== 'bigint') {
-        return schemaIssue(info, 'type', 'bigint', this.message, input);
-      }
-
-      // Execute pipe and return result
-      return pipeResultAsync(input, this.pipe, info, 'bigint');
-    },
-  };
-}
+) => new BigintSchemaAsync(arg1, arg2);

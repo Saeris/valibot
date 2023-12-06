@@ -1,15 +1,22 @@
-import type { BaseSchema, ErrorMessage, Pipe } from '../../types/index.ts';
+import {
+  BaseSchema,
+  type ParseInfo,
+  type ErrorMessage,
+  type Pipe,
+} from '../../types/index.ts';
 import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
 
 /**
  * Bigint schema type.
  */
-export interface BigintSchema<TOutput = bigint>
-  extends BaseSchema<bigint, TOutput> {
+export class BigintSchema<TOutput = bigint> extends BaseSchema<
+  bigint,
+  TOutput
+> {
   /**
    * The schema type.
    */
-  type: 'bigint';
+  readonly type = 'bigint';
   /**
    * The error message.
    */
@@ -17,52 +24,49 @@ export interface BigintSchema<TOutput = bigint>
   /**
    * The validation and transformation pipeline.
    */
-  pipe: Pipe<bigint> | undefined;
+  pipe?: Pipe<TOutput>;
+
+  constructor(arg1?: ErrorMessage | Pipe<TOutput>, arg2?: Pipe<TOutput>) {
+    super();
+    // Get message and pipe argument
+    const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
+    this.message = message;
+    this.pipe = pipe;
+  }
+
+  _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (typeof input !== 'bigint') {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Execute pipe and return result
+    return pipeResult(input as TOutput, this.pipe, info, this.type);
+  }
 }
 
-/**
- * Creates a bigint schema.
- *
- * @param pipe A validation and transformation pipe.
- *
- * @returns A bigint schema.
- */
-export function bigint(pipe?: Pipe<bigint>): BigintSchema;
+export interface BaseSchemaFactory {
+  /**
+   * Creates a bigint schema.
+   *
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns A bigint schema.
+   */
+  (pipe?: Pipe<bigint>): BigintSchema;
 
-/**
- * Creates a bigint schema.
- *
- * @param message The error message.
- * @param pipe A validation and transformation pipe.
- *
- * @returns A bigint schema.
- */
-export function bigint(
-  message?: ErrorMessage,
-  pipe?: Pipe<bigint>
-): BigintSchema;
+  /**
+   * Creates a bigint schema.
+   *
+   * @param message The error message.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns A bigint schema.
+   */
+  (message?: ErrorMessage, pipe?: Pipe<bigint>): BigintSchema;
+}
 
-export function bigint(
+export const bigint: BaseSchemaFactory = (
   arg1?: ErrorMessage | Pipe<bigint>,
   arg2?: Pipe<bigint>
-): BigintSchema {
-  // Get message and pipe argument
-  const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
-
-  // Create and return bigint schema
-  return {
-    type: 'bigint',
-    async: false,
-    message,
-    pipe,
-    _parse(input, info) {
-      // Check type of input
-      if (typeof input !== 'bigint') {
-        return schemaIssue(info, 'type', 'bigint', this.message, input);
-      }
-
-      // Execute pipe and return result
-      return pipeResult(input, this.pipe, info, 'bigint');
-    },
-  };
-}
+) => new BigintSchema(arg1, arg2);

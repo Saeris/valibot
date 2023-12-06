@@ -1,4 +1,8 @@
-import type { BaseSchema, ErrorMessage } from '../../types/index.ts';
+import {
+  BaseSchema,
+  type ParseInfo,
+  type ErrorMessage,
+} from '../../types/index.ts';
 import { parseResult, schemaIssue } from '../../utils/index.ts';
 
 /**
@@ -12,12 +16,14 @@ export type Enum = {
 /**
  * Native enum schema type.
  */
-export interface EnumSchema<TEnum extends Enum, TOutput = TEnum[keyof TEnum]>
-  extends BaseSchema<TEnum[keyof TEnum], TOutput> {
+export class EnumSchema<
+  TEnum extends Enum,
+  TOutput = TEnum[keyof TEnum]
+> extends BaseSchema<TEnum[keyof TEnum], TOutput> {
   /**
    * The schema type.
    */
-  type: 'enum';
+  readonly type = 'enum';
   /**
    * The enum value.
    */
@@ -26,6 +32,22 @@ export interface EnumSchema<TEnum extends Enum, TOutput = TEnum[keyof TEnum]>
    * The error message.
    */
   message: ErrorMessage;
+
+  constructor(enum_: TEnum, message: ErrorMessage = 'Invalid type') {
+    super();
+    this.enum = enum_;
+    this.message = message;
+  }
+
+  _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (!Object.values(this.enum).includes(input as any)) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Return parse result
+    return parseResult(true, input as TOutput);
+  }
 }
 
 /**
@@ -36,26 +58,8 @@ export interface EnumSchema<TEnum extends Enum, TOutput = TEnum[keyof TEnum]>
  *
  * @returns A enum schema.
  */
-export function enum_<TEnum extends Enum>(
-  enum_: TEnum,
-  message: ErrorMessage = 'Invalid type'
-): EnumSchema<TEnum> {
-  return {
-    type: 'enum',
-    async: false,
-    enum: enum_,
-    message,
-    _parse(input, info) {
-      // Check type of input
-      if (!Object.values(this.enum).includes(input as any)) {
-        return schemaIssue(info, 'type', 'enum', this.message, input);
-      }
-
-      // Return parse result
-      return parseResult(true, input as TEnum[keyof TEnum]);
-    },
-  };
-}
+export const enum_ = (enum_: Enum, message?: ErrorMessage) =>
+  new EnumSchema(enum_, message);
 
 /**
  * See {@link enum_}

@@ -1,8 +1,9 @@
-import type {
+import {
   BaseSchema,
-  ErrorMessage,
-  Input,
-  Output,
+  type ParseInfo,
+  type ErrorMessage,
+  type Input,
+  type Output,
 } from '../../types/index.ts';
 import { schemaIssue } from '../../utils/index.ts';
 
@@ -14,14 +15,14 @@ export type NonOptional<T> = T extends undefined ? never : T;
 /**
  * Non optional schema type.
  */
-export interface NonOptionalSchema<
+export class NonOptionalSchema<
   TWrapped extends BaseSchema,
   TOutput = NonOptional<Output<TWrapped>>
 > extends BaseSchema<NonOptional<Input<TWrapped>>, TOutput> {
   /**
    * The schema type.
    */
-  type: 'non_optional';
+  readonly type = 'non_optional';
   /**
    * The wrapped schema.
    */
@@ -30,6 +31,22 @@ export interface NonOptionalSchema<
    * The error message.
    */
   message: ErrorMessage;
+
+  constructor(wrapped: TWrapped, message: ErrorMessage = 'Invalid type') {
+    super();
+    this.wrapped = wrapped;
+    this.message = message;
+  }
+
+  _parse(input: unknown, info?: ParseInfo) {
+    // Allow `undefined` values not to pass
+    if (input === undefined) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Return result of wrapped schema
+    return this.wrapped._parse(input, info);
+  }
 }
 
 /**
@@ -40,23 +57,5 @@ export interface NonOptionalSchema<
  *
  * @returns A non optional schema.
  */
-export function nonOptional<TWrapped extends BaseSchema>(
-  wrapped: TWrapped,
-  message: ErrorMessage = 'Invalid type'
-): NonOptionalSchema<TWrapped> {
-  return {
-    type: 'non_optional',
-    async: false,
-    wrapped,
-    message,
-    _parse(input, info) {
-      // Allow `undefined` values not to pass
-      if (input === undefined) {
-        return schemaIssue(info, 'type', 'non_optional', this.message, input);
-      }
-
-      // Return result of wrapped schema
-      return this.wrapped._parse(input, info);
-    },
-  };
-}
+export const nonOptional = (wrapped: BaseSchema, message?: ErrorMessage) =>
+  new NonOptionalSchema(wrapped, message);

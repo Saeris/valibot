@@ -1,25 +1,35 @@
-import type {
-  BaseSchema,
+import {
+  type BaseSchema,
   BaseSchemaAsync,
-  Input,
-  Output,
+  type ParseInfo,
+  type Input,
+  type Output,
 } from '../../types/index.ts';
 
 /**
  * Recursive schema async type.
  */
-export interface RecursiveSchemaAsync<
+export class RecursiveSchemaAsync<
   TSchemaGetter extends () => BaseSchema | BaseSchemaAsync,
   TOutput = Output<ReturnType<TSchemaGetter>>
 > extends BaseSchemaAsync<Input<ReturnType<TSchemaGetter>>, TOutput> {
   /**
    * The schema type.
    */
-  type: 'recursive';
+  readonly type = 'recursive';
   /**
    * The schema getter.
    */
   getter: TSchemaGetter;
+
+  constructor(getter: TSchemaGetter) {
+    super();
+    this.getter = getter;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    return this.getter()._parse(input, info);
+  }
 }
 
 /**
@@ -29,15 +39,8 @@ export interface RecursiveSchemaAsync<
  *
  * @returns An async recursive schema.
  */
-export function recursiveAsync<
+export const recursiveAsync = <
   TSchemaGetter extends () => BaseSchema | BaseSchemaAsync
->(getter: TSchemaGetter): RecursiveSchemaAsync<TSchemaGetter> {
-  return {
-    type: 'recursive',
-    async: true,
-    getter,
-    async _parse(input, info) {
-      return this.getter()._parse(input, info);
-    },
-  };
-}
+>(
+  getter: TSchemaGetter
+) => new RecursiveSchemaAsync(getter);

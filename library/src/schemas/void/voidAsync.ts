@@ -1,19 +1,40 @@
-import type { BaseSchemaAsync, ErrorMessage } from '../../types/index.ts';
+import {
+  BaseSchemaAsync,
+  type ParseInfo,
+  type ErrorMessage,
+} from '../../types/index.ts';
 import { parseResult, schemaIssue } from '../../utils/index.ts';
 
 /**
  * Void schema async type.
  */
-export interface VoidSchemaAsync<TOutput = void>
-  extends BaseSchemaAsync<void, TOutput> {
+export class VoidSchemaAsync<TOutput = void> extends BaseSchemaAsync<
+  void,
+  TOutput
+> {
   /**
    * The schema type.
    */
-  type: 'void';
+  readonly type = 'void';
   /**
    * The error message.
    */
   message: ErrorMessage;
+
+  constructor(message: ErrorMessage = 'Invalid type') {
+    super();
+    this.message = message;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (typeof input !== 'undefined') {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Return parse result
+    return parseResult(true, input as TOutput);
+  }
 }
 
 /**
@@ -23,24 +44,8 @@ export interface VoidSchemaAsync<TOutput = void>
  *
  * @returns An async void schema.
  */
-export function voidAsync(
-  message: ErrorMessage = 'Invalid type'
-): VoidSchemaAsync {
-  return {
-    type: 'void',
-    async: true,
-    message,
-    async _parse(input, info) {
-      // Check type of input
-      if (typeof input !== 'undefined') {
-        return schemaIssue(info, 'type', 'void', this.message, input);
-      }
-
-      // Return parse result
-      return parseResult(true, input);
-    },
-  };
-}
+export const voidAsync = (message?: ErrorMessage) =>
+  new VoidSchemaAsync(message);
 
 /**
  * See {@link voidAsync}

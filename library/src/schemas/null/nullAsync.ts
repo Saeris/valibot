@@ -1,19 +1,40 @@
-import type { BaseSchemaAsync, ErrorMessage } from '../../types/index.ts';
+import {
+  BaseSchemaAsync,
+  type ParseInfo,
+  type ErrorMessage,
+} from '../../types/index.ts';
 import { parseResult, schemaIssue } from '../../utils/index.ts';
 
 /**
  * Null schema async type.
  */
-export interface NullSchemaAsync<TOutput = null>
-  extends BaseSchemaAsync<null, TOutput> {
+export class NullSchemaAsync<TOutput = null> extends BaseSchemaAsync<
+  null,
+  TOutput
+> {
   /**
    * The schema type.
    */
-  type: 'null';
+  readonly type = 'null';
   /**
    * The error message.
    */
   message: ErrorMessage;
+
+  constructor(message: ErrorMessage = 'Invalid type') {
+    super();
+    this.message = message;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (input !== null) {
+      return schemaIssue(info, 'type', 'null', this.message, input);
+    }
+
+    // Return parse result
+    return parseResult(true, input as TOutput);
+  }
 }
 
 /**
@@ -23,24 +44,8 @@ export interface NullSchemaAsync<TOutput = null>
  *
  * @returns An async null schema.
  */
-export function nullAsync(
-  message: ErrorMessage = 'Invalid type'
-): NullSchemaAsync {
-  return {
-    type: 'null',
-    async: true,
-    message,
-    async _parse(input, info) {
-      // Check type of input
-      if (input !== null) {
-        return schemaIssue(info, 'type', 'null', this.message, input);
-      }
-
-      // Return parse result
-      return parseResult(true, input);
-    },
-  };
-}
+export const nullAsync = (message?: ErrorMessage) =>
+  new NullSchemaAsync(message);
 
 /**
  * See {@link nullAsync}

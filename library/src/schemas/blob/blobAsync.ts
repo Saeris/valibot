@@ -1,7 +1,8 @@
-import type {
+import {
   BaseSchemaAsync,
-  ErrorMessage,
-  PipeAsync,
+  type ParseInfo,
+  type ErrorMessage,
+  type PipeAsync,
 } from '../../types/index.ts';
 import {
   defaultArgs,
@@ -12,12 +13,14 @@ import {
 /**
  * Blob schema async type.
  */
-export interface BlobSchemaAsync<TOutput = Blob>
-  extends BaseSchemaAsync<Blob, TOutput> {
+export class BlobSchemaAsync<TOutput = Blob> extends BaseSchemaAsync<
+  Blob,
+  TOutput
+> {
   /**
    * The schema type.
    */
-  type: 'blob';
+  readonly type = 'blob';
   /**
    * The error message.
    */
@@ -25,52 +28,52 @@ export interface BlobSchemaAsync<TOutput = Blob>
   /**
    * The validation and transformation pipeline.
    */
-  pipe: PipeAsync<Blob> | undefined;
+  pipe?: PipeAsync<TOutput>;
+
+  constructor(
+    arg1?: ErrorMessage | PipeAsync<TOutput>,
+    arg2?: PipeAsync<TOutput>
+  ) {
+    super();
+    // Get message and pipe argument
+    const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
+    this.message = message;
+    this.pipe = pipe;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (!(input instanceof Blob)) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Execute pipe and return result
+    return pipeResultAsync(input as TOutput, this.pipe, info, this.type);
+  }
 }
 
-/**
- * Creates an async blob schema.
- *
- * @param pipe A validation and transformation pipe.
- *
- * @returns An async blob schema.
- */
-export function blobAsync(pipe?: PipeAsync<Blob>): BlobSchemaAsync;
+export interface BlobSchemaAsyncFactory {
+  /**
+   * Creates an async blob schema.
+   *
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns An async blob schema.
+   */
+  (pipe?: PipeAsync<Blob>): BlobSchemaAsync;
 
-/**
- * Creates an async blob schema.
- *
- * @param message The error message.
- * @param pipe A validation and transformation pipe.
- *
- * @returns An async blob schema.
- */
-export function blobAsync(
-  message?: ErrorMessage,
-  pipe?: PipeAsync<Blob>
-): BlobSchemaAsync;
+  /**
+   * Creates an async blob schema.
+   *
+   * @param message The error message.
+   * @param pipe A validation and transformation pipe.
+   *
+   * @returns An async blob schema.
+   */
+  (message?: ErrorMessage, pipe?: PipeAsync<Blob>): BlobSchemaAsync;
+}
 
-export function blobAsync(
+export const blobAsync: BlobSchemaAsyncFactory = (
   arg1?: ErrorMessage | PipeAsync<Blob>,
   arg2?: PipeAsync<Blob>
-): BlobSchemaAsync {
-  // Get message and pipe argument
-  const [message = 'Invalid type', pipe] = defaultArgs(arg1, arg2);
-
-  // Create and return async blob schema
-  return {
-    type: 'blob',
-    async: true,
-    message,
-    pipe,
-    async _parse(input, info) {
-      // Check type of input
-      if (!(input instanceof Blob)) {
-        return schemaIssue(info, 'type', 'blob', this.message, input);
-      }
-
-      // Execute pipe and return result
-      return pipeResultAsync(input, this.pipe, info, 'blob');
-    },
-  };
-}
+) => new BlobSchemaAsync(arg1, arg2);

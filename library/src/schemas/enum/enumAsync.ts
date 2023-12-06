@@ -1,18 +1,22 @@
-import type { BaseSchemaAsync, ErrorMessage } from '../../types/index.ts';
+import {
+  BaseSchemaAsync,
+  type ParseInfo,
+  type ErrorMessage,
+} from '../../types/index.ts';
 import { parseResult, schemaIssue } from '../../utils/index.ts';
 import type { Enum } from './enum.ts';
 
 /**
  * Native enum schema async type.
  */
-export interface EnumSchemaAsync<
+export class EnumSchemaAsync<
   TEnum extends Enum,
   TOutput = TEnum[keyof TEnum]
 > extends BaseSchemaAsync<TEnum[keyof TEnum], TOutput> {
   /**
    * The schema type.
    */
-  type: 'enum';
+  readonly type = 'enum';
   /**
    * The enum value.
    */
@@ -21,6 +25,22 @@ export interface EnumSchemaAsync<
    * The error message.
    */
   message: ErrorMessage;
+
+  constructor(enum_: TEnum, message: ErrorMessage = 'Invalid type') {
+    super();
+    this.enum = enum_;
+    this.message = message;
+  }
+
+  async _parse(input: unknown, info?: ParseInfo) {
+    // Check type of input
+    if (!Object.values(this.enum).includes(input as any)) {
+      return schemaIssue(info, 'type', this.type, this.message, input);
+    }
+
+    // Return parse result
+    return parseResult(true, input as TOutput);
+  }
 }
 
 /**
@@ -31,26 +51,8 @@ export interface EnumSchemaAsync<
  *
  * @returns An async enum schema.
  */
-export function enumAsync<TEnum extends Enum>(
-  enum_: TEnum,
-  message: ErrorMessage = 'Invalid type'
-): EnumSchemaAsync<TEnum> {
-  return {
-    type: 'enum',
-    async: true,
-    enum: enum_,
-    message,
-    async _parse(input, info) {
-      // Check type of input
-      if (!Object.values(this.enum).includes(input as any)) {
-        return schemaIssue(info, 'type', 'enum', this.message, input);
-      }
-
-      // Return parse result
-      return parseResult(true, input as TEnum[keyof TEnum]);
-    },
-  };
-}
+export const enumAsync = (enum_: Enum, message?: ErrorMessage) =>
+  new EnumSchemaAsync(enum_, message);
 
 /**
  * See {@link enumAsync}

@@ -1,18 +1,31 @@
-import type { BaseSchema, ErrorMessage } from '../../types/index.ts';
+import {
+  BaseSchema,
+  type ParseInfo,
+  type ErrorMessage,
+} from '../../types/index.ts';
 import { schemaIssue } from '../../utils/index.ts';
 
 /**
  * Never schema type.
  */
-export interface NeverSchema extends BaseSchema<never> {
+export class NeverSchema extends BaseSchema<never> {
   /**
    * The schema type.
    */
-  type: 'never';
+  readonly type = 'never';
   /**
    * The error message.
    */
   message: ErrorMessage;
+
+  constructor(message: ErrorMessage = 'Invalid type') {
+    super();
+    this.message = message;
+  }
+
+  _parse(input: unknown, info?: ParseInfo) {
+    return schemaIssue(info, 'type', this.type, this.message, input);
+  }
 }
 
 /**
@@ -22,13 +35,4 @@ export interface NeverSchema extends BaseSchema<never> {
  *
  * @returns A never schema.
  */
-export function never(message: ErrorMessage = 'Invalid type'): NeverSchema {
-  return {
-    type: 'never',
-    async: false,
-    message,
-    _parse(input, info) {
-      return schemaIssue(info, 'type', 'never', this.message, input);
-    },
-  };
-}
+export const never = (message?: ErrorMessage) => new NeverSchema(message);

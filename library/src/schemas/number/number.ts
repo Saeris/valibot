@@ -14,10 +14,6 @@ export class NumberSchema<TOutput = number> extends BaseSchema<
   TOutput
 > {
   /**
-   * The schema type.
-   */
-  readonly type = 'number';
-  /**
    * The error message.
    */
   message: ErrorMessage;
@@ -37,11 +33,11 @@ export class NumberSchema<TOutput = number> extends BaseSchema<
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (typeof input !== 'number' || isNaN(input)) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'number', this.message, input);
     }
 
     // Execute pipe and return result
-    return pipeResult(input as TOutput, this.pipe, info, this.type);
+    return pipeResult(input as TOutput, this.pipe, info, 'number');
   }
 }
 

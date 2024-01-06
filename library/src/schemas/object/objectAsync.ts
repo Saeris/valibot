@@ -28,10 +28,6 @@ export class ObjectSchemaAsync<
   TOutput = ObjectOutput<TEntries, TRest>
 > extends BaseSchemaAsync<ObjectInput<TEntries, TRest>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'object';
-  /**
    * The object entries schema.
    */
   entries: TEntries;
@@ -72,7 +68,7 @@ export class ObjectSchemaAsync<
   async _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!input || typeof input !== 'object') {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'object', this.message, input);
     }
 
     // Cache object entries lazy
@@ -202,7 +198,7 @@ export class ObjectSchemaAsync<
         output as TOutput,
         this.pipe,
         info,
-        this.type,
+        'object',
         issues
       );
     }

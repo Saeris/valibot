@@ -17,10 +17,6 @@ export class NonNullableSchemaAsync<
   TOutput = NonNullable<Output<TWrapped>>
 > extends BaseSchemaAsync<NonNullable<Input<TWrapped>>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'non_nullable';
-  /**
    * The wrapped schema.
    */
   wrapped: TWrapped;
@@ -38,7 +34,7 @@ export class NonNullableSchemaAsync<
   async _parse(input: unknown, info?: ParseInfo) {
     // Allow `null` values not to pass
     if (input === null) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'non_nullable', this.message, input);
     }
 
     // Return result of wrapped schema

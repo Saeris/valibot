@@ -8,6 +8,7 @@ import {
 } from '../../types/index.ts';
 import { parseResult, schemaIssue } from '../../utils/index.ts';
 import type { ObjectSchema } from '../object/index.ts';
+import { isObjectSchema } from '../object/index.ts';
 
 /**
  * Variant option type.
@@ -15,7 +16,6 @@ import type { ObjectSchema } from '../object/index.ts';
 export type VariantOption<TKey extends string> =
   | ObjectSchema<Record<TKey, BaseSchema>, any>
   | (BaseSchema & {
-      type: 'variant';
       options: VariantOptions<TKey>;
     });
 
@@ -36,10 +36,6 @@ export class VariantSchema<
   const TOptions extends VariantOptions<TKey>,
   TOutput = Output<TOptions[number]>
 > extends BaseSchema<Input<TOptions[number]>, TOutput> {
-  /**
-   * The schema type.
-   */
-  readonly type = 'variant';
   /**
    * The discriminator key.
    */
@@ -67,7 +63,7 @@ export class VariantSchema<
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!input || typeof input !== 'object' || !(this.key in input)) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'variant', this.message, input);
     }
 
     // Create issues and output
@@ -78,7 +74,7 @@ export class VariantSchema<
     const parseOptions = (options: VariantOptions<TKey>) => {
       for (const schema of options) {
         // If it is an object schema, parse discriminator key
-        if (schema.type === 'object') {
+        if (isObjectSchema(schema)) {
           const keyResult = schema.entries[this.key]._parse(
             (input as Record<TKey, unknown>)[this.key],
             info
@@ -105,7 +101,7 @@ export class VariantSchema<
 
           // Otherwise, if it is a variant parse its options
           // recursively
-        } else if (schema.type === 'variant') {
+        } else if (schema instanceof VariantSchema) {
           parseOptions(schema.options);
 
           // If variant option was found, break loop to end execution
@@ -130,7 +126,7 @@ export class VariantSchema<
     }
 
     // If discriminator key is invalid, return issue
-    return schemaIssue(info, 'type', this.type, this.message, input);
+    return schemaIssue(info, 'type', 'variant', this.message, input);
   }
 }
 

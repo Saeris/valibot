@@ -13,10 +13,6 @@ export class NullSchemaAsync<TOutput = null> extends BaseSchemaAsync<
   TOutput
 > {
   /**
-   * The schema type.
-   */
-  readonly type = 'null';
-  /**
    * The error message.
    */
   message: ErrorMessage;

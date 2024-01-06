@@ -21,10 +21,6 @@ export class SetSchema<
   TOutput = SetOutput<TValue>
 > extends BaseSchema<SetInput<TValue>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'set';
-  /**
    * The set value schema.
    */
   value: TValue;
@@ -53,7 +49,7 @@ export class SetSchema<
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!(input instanceof Set)) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'set', this.message, input);
     }
 
     // Create key, typed, output and issues
@@ -111,7 +107,7 @@ export class SetSchema<
 
     // If output is typed, execute pipe
     if (typed) {
-      return pipeResult(output as TOutput, this.pipe, info, this.type, issues);
+      return pipeResult(output as TOutput, this.pipe, info, 'set', issues);
     }
 
     // Otherwise, return untyped parse result

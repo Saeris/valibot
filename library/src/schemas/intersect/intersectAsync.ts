@@ -26,10 +26,6 @@ export class IntersectSchemaAsync<
   TOutput = IntersectOutput<TOptions>
 > extends BaseSchemaAsync<IntersectInput<TOptions>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'intersect';
-  /**
    * The intersect options.
    */
   options: TOptions;
@@ -100,7 +96,7 @@ export class IntersectSchemaAsync<
 
         // If outputs can't be merged, return issue
         if (result.invalid) {
-          return schemaIssue(info, 'type', this.type, this.message, input);
+          return schemaIssue(info, 'type', 'intersect', this.message, input);
         }
 
         // Otherwise, set merged output

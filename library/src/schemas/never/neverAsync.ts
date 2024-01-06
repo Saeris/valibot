@@ -10,10 +10,6 @@ import { schemaIssue } from '../../utils/index.ts';
  */
 export class NeverSchemaAsync extends BaseSchemaAsync<never> {
   /**
-   * The schema type.
-   */
-  readonly type = 'never';
-  /**
    * The error message.
    */
   message: ErrorMessage;
@@ -24,7 +20,7 @@ export class NeverSchemaAsync extends BaseSchemaAsync<never> {
   }
 
   async _parse(input: unknown, info?: ParseInfo) {
-    return schemaIssue(info, 'type', this.type, this.message, input);
+    return schemaIssue(info, 'type', 'never', this.message, input);
   }
 }
 

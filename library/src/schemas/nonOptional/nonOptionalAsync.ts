@@ -17,10 +17,6 @@ export class NonOptionalSchemaAsync<
   TOutput = NonOptional<Output<TWrapped>>
 > extends BaseSchemaAsync<NonOptional<Input<TWrapped>>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'non_optional';
-  /**
    * The wrapped schema.
    */
   wrapped: TWrapped;
@@ -38,7 +34,7 @@ export class NonOptionalSchemaAsync<
   async _parse(input: unknown, info?: ParseInfo) {
     // Allow `undefined` values not to pass
     if (input === undefined) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'non_optional', this.message, input);
     }
 
     // Return result of wrapped schema

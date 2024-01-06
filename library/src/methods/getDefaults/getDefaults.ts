@@ -1,4 +1,10 @@
-import { isObjectSchema, isTupleSchema } from '../../schemas/index.ts';
+import {
+  ObjectSchema,
+  TupleSchema,
+  isObjectSchema,
+  isTupleSchema,
+} from '../../schemas/index.ts';
+import { isAsyncSchema } from '../../utils/isAsyncSchema.ts';
 import {
   getDefault,
   type SchemaWithMaybeDefault,
@@ -25,7 +31,7 @@ export function getDefaults<TSchema extends SchemaWithMaybeDefault>(
   }
   // Otherwise, check if schema is of kind object or tuple
   // If it is an object schema, set object with default value of each entry
-  if (isObjectSchema(schema)) {
+  if (isObjectSchema(schema) && !isAsyncSchema(schema)) {
     return Object.entries(schema.entries).reduce(
       (hash, [key, value]) =>
         Object.assign(hash, { [key]: getDefaults(value) }),
@@ -33,7 +39,7 @@ export function getDefaults<TSchema extends SchemaWithMaybeDefault>(
     ) as DefaultValues<TSchema>;
   }
   // If it is a tuple schema, set array with default value of each item
-  if (isTupleSchema(schema)) {
+  if (isTupleSchema(schema) && !isAsyncSchema(schema)) {
     return schema.items.map(getDefaults) as DefaultValues<TSchema>;
   }
 }

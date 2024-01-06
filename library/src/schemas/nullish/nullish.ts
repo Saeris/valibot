@@ -21,10 +21,6 @@ export class NullishSchema<
     : Output<TWrapped> | null | undefined
 > extends BaseSchema<Input<TWrapped> | null | undefined, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'nullish';
-  /**
    * The wrapped schema.
    */
   wrapped: TWrapped;

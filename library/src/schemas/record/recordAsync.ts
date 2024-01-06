@@ -41,10 +41,6 @@ export class RecordSchemaAsync<
   TOutput = RecordOutput<TKey, TValue>
 > extends BaseSchemaAsync<RecordInput<TKey, TValue>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'record';
-  /**
    * The key schema.
    */
   key: TKey;
@@ -83,7 +79,7 @@ export class RecordSchemaAsync<
   async _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!input || typeof input !== 'object') {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'record', this.message, input);
     }
 
     // Create typed, issues and output
@@ -175,7 +171,7 @@ export class RecordSchemaAsync<
         output as TOutput,
         this.pipe,
         info,
-        this.type,
+        'record',
         issues
       );
     }

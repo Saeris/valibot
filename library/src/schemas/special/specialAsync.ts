@@ -18,10 +18,6 @@ export class SpecialSchemaAsync<
   TOutput = TInput
 > extends BaseSchemaAsync<TInput, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'special';
-  /**
    * The type check function.
    */
   check: (input: unknown) => boolean | Promise<boolean>;
@@ -50,11 +46,11 @@ export class SpecialSchemaAsync<
   async _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!(await this.check(input))) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'special', this.message, input);
     }
 
     // Execute pipe and return result
-    return pipeResultAsync(input as TOutput, this.pipe, info, this.type);
+    return pipeResultAsync(input as TOutput, this.pipe, info, 'special');
   }
 }
 

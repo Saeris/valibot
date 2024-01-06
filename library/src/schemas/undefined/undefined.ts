@@ -13,10 +13,6 @@ export class UndefinedSchema<TOutput = undefined> extends BaseSchema<
   TOutput
 > {
   /**
-   * The schema type.
-   */
-  readonly type = 'undefined';
-  /**
    * The error message.
    */
   message: ErrorMessage;
@@ -29,7 +25,7 @@ export class UndefinedSchema<TOutput = undefined> extends BaseSchema<
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (typeof input !== 'undefined') {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'undefined', this.message, input);
     }
 
     // Return parse result

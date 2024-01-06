@@ -55,14 +55,6 @@ export type SchemaResult<TOutput> =
  */
 export abstract class Schema<TInput = any, TOutput = TInput> {
   /**
-   * The schema type.
-   */
-  abstract type: string;
-  /**
-   * Whether it's async.
-   */
-  abstract async: boolean;
-  /**
    * Input and output type.
    *
    * @internal
@@ -77,14 +69,6 @@ export abstract class BaseSchema<TInput = any, TOutput = TInput> extends Schema<
   TInput,
   TOutput
 > {
-  /**
-   * The schema type.
-   */
-  abstract type: string;
-  /**
-   * Whether it's async.
-   */
-  readonly async = false;
   /**
    * Parses unknown input based on its schema.
    *
@@ -105,14 +89,6 @@ export abstract class BaseSchemaAsync<
   TInput = any,
   TOutput = TInput
 > extends Schema<TInput, TOutput> {
-  /**
-   * The schema type.
-   */
-  abstract type: string;
-  /**
-   * Whether it's async.
-   */
-  readonly async = true;
   /**
    * Parses unknown input based on its schema.
    *

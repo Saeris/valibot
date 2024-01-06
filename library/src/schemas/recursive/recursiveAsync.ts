@@ -14,10 +14,6 @@ export class RecursiveSchemaAsync<
   TOutput = Output<ReturnType<TSchemaGetter>>
 > extends BaseSchemaAsync<Input<ReturnType<TSchemaGetter>>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'recursive';
-  /**
    * The schema getter.
    */
   getter: TSchemaGetter;

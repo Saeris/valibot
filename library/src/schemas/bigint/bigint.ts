@@ -14,9 +14,6 @@ export class BigintSchema<TOutput = bigint> extends BaseSchema<
   TOutput
 > {
   /**
-   * The schema type.
-   */
-  readonly type = 'bigint';
   /**
    * The error message.
    */
@@ -37,11 +34,11 @@ export class BigintSchema<TOutput = bigint> extends BaseSchema<
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (typeof input !== 'bigint') {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'bigint', this.message, input);
     }
 
     // Execute pipe and return result
-    return pipeResult(input as TOutput, this.pipe, info, this.type);
+    return pipeResult(input as TOutput, this.pipe, info, 'bigint');
   }
 }
 

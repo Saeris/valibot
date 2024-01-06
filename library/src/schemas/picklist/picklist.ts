@@ -14,10 +14,6 @@ export class PicklistSchema<
   TOutput = TOptions[number]
 > extends BaseSchema<TOptions[number], TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'picklist';
-  /**
    * The picklist options.
    */
   options: TOptions;
@@ -35,7 +31,7 @@ export class PicklistSchema<
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!this.options.includes(input as any)) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'picklist', this.message, input);
     }
 
     // Return inpot as output

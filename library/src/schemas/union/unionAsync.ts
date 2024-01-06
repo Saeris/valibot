@@ -26,10 +26,6 @@ export class UnionSchemaAsync<
   TOutput = Output<TOptions[number]>
 > extends BaseSchemaAsync<Input<TOptions[number]>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'union';
-  /**
    * The union options.
    */
   options: TOptions;
@@ -78,7 +74,7 @@ export class UnionSchemaAsync<
     }
 
     // Otherwise, return schema issue
-    return schemaIssue(info, 'type', this.type, this.message, input, issues);
+    return schemaIssue(info, 'type', 'union', this.message, input, issues);
   }
 }
 

@@ -11,10 +11,6 @@ import { defaultArgs, pipeResult, schemaIssue } from '../../utils/index.ts';
  */
 export class DateSchema<TOutput = Date> extends BaseSchema<Date, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'date';
-  /**
    * The error message.
    */
   message: ErrorMessage;
@@ -34,11 +30,11 @@ export class DateSchema<TOutput = Date> extends BaseSchema<Date, TOutput> {
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!(input instanceof Date) || isNaN(input.getTime())) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'date', this.message, input);
     }
 
     // Execute pipe and return result
-    return pipeResult(input as TOutput, this.pipe, info, this.type);
+    return pipeResult(input as TOutput, this.pipe, info, 'date');
   }
 }
 

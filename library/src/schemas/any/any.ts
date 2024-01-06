@@ -6,10 +6,6 @@ import { pipeResult } from '../../utils/index.ts';
  */
 export class AnySchema<TOutput = any> extends BaseSchema<any, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'any';
-  /**
    * The validation and transformation pipeline.
    */
   pipe?: Pipe<any>;
@@ -20,7 +16,7 @@ export class AnySchema<TOutput = any> extends BaseSchema<any, TOutput> {
   }
 
   _parse(input: unknown, info?: ParseInfo) {
-    return pipeResult(input, this.pipe, info, this.type);
+    return pipeResult(input, this.pipe, info, 'any');
   }
 }
 

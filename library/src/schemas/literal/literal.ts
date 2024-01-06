@@ -14,10 +14,6 @@ export class LiteralSchema<
   TOutput = TLiteral
 > extends BaseSchema<TLiteral, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'literal';
-  /**
    * The literal value.
    */
   literal: TLiteral;
@@ -35,7 +31,7 @@ export class LiteralSchema<
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (input !== this.literal) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'literal', this.message, input);
     }
 
     // Return parse result

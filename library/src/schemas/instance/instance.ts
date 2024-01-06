@@ -19,10 +19,6 @@ export class InstanceSchema<
   TOutput = InstanceType<TClass>
 > extends BaseSchema<InstanceType<TClass>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'instance';
-  /**
    * The class of the instance.
    */
   class: TClass;
@@ -51,11 +47,11 @@ export class InstanceSchema<
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!(input instanceof this.class)) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'instance', this.message, input);
     }
 
     // Execute pipe and return result
-    return pipeResult(input as TOutput, this.pipe, info, this.type);
+    return pipeResult(input as TOutput, this.pipe, info, 'instance');
   }
 }
 

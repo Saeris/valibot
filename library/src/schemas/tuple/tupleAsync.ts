@@ -31,10 +31,6 @@ export class TupleSchemaAsync<
   TOutput = TupleOutput<TItems, TRest>
 > extends BaseSchemaAsync<TupleInput<TItems, TRest>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'tuple';
-  /**
    * The tuple items schema.
    */
   items: TItems;
@@ -72,7 +68,7 @@ export class TupleSchemaAsync<
   async _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!Array.isArray(input) || this.items.length > input.length) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'tuple', this.message, input);
     }
 
     // Create typed, issues and output
@@ -193,7 +189,7 @@ export class TupleSchemaAsync<
         output as TOutput,
         this.pipe,
         info,
-        this.type,
+        'tuple',
         issues
       );
     }

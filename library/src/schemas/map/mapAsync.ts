@@ -24,10 +24,6 @@ export class MapSchemaAsync<
   TOutput = MapOutput<TKey, TValue>
 > extends BaseSchemaAsync<MapInput<TKey, TValue>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'map';
-  /**
    * The map key schema.
    */
   key: TKey;
@@ -62,7 +58,7 @@ export class MapSchemaAsync<
   async _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!(input instanceof Map)) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'map', this.message, input);
     }
 
     // Create typed, issues and output
@@ -146,13 +142,7 @@ export class MapSchemaAsync<
 
     // If output is typed, execute pipe
     if (typed) {
-      return pipeResultAsync(
-        output as TOutput,
-        this.pipe,
-        info,
-        this.type,
-        issues
-      );
+      return pipeResultAsync(output as TOutput, this.pipe, info, 'map', issues);
     }
 
     // Otherwise, return untyped parse result

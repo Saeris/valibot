@@ -14,10 +14,6 @@ export class SpecialSchema<TInput, TOutput = TInput> extends BaseSchema<
   TOutput
 > {
   /**
-   * The schema type.
-   */
-  readonly type = 'special';
-  /**
    * The type check function.
    */
   check: (input: unknown) => boolean;
@@ -46,11 +42,11 @@ export class SpecialSchema<TInput, TOutput = TInput> extends BaseSchema<
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!this.check(input)) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'special', this.message, input);
     }
 
     // Execute pipe and return result
-    return pipeResult(input as TOutput, this.pipe, info, this.type);
+    return pipeResult(input as TOutput, this.pipe, info, 'special');
   }
 }
 

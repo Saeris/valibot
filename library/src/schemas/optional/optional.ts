@@ -21,10 +21,6 @@ export class OptionalSchema<
     : Output<TWrapped> | undefined
 > extends BaseSchema<Input<TWrapped> | undefined, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'optional';
-  /**
    * The wrapped schema.
    */
   wrapped: TWrapped;

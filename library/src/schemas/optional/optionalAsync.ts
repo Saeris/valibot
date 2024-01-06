@@ -22,10 +22,6 @@ export class OptionalSchemaAsync<
     : Output<TWrapped> | undefined
 > extends BaseSchemaAsync<Input<TWrapped> | undefined, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'optional';
-  /**
    * The wrapped schema.
    */
   wrapped: TWrapped;

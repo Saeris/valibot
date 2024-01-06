@@ -13,10 +13,6 @@ export class VoidSchemaAsync<TOutput = void> extends BaseSchemaAsync<
   TOutput
 > {
   /**
-   * The schema type.
-   */
-  readonly type = 'void';
-  /**
    * The error message.
    */
   message: ErrorMessage;
@@ -29,7 +25,7 @@ export class VoidSchemaAsync<TOutput = void> extends BaseSchemaAsync<
   async _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (typeof input !== 'undefined') {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'void', this.message, input);
     }
 
     // Return parse result

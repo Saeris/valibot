@@ -18,10 +18,6 @@ export class BooleanSchemaAsync<TOutput = boolean> extends BaseSchemaAsync<
   TOutput
 > {
   /**
-   * The schema type.
-   */
-  readonly type = 'boolean';
-  /**
    * The error message.
    */
   message: ErrorMessage;
@@ -44,11 +40,11 @@ export class BooleanSchemaAsync<TOutput = boolean> extends BaseSchemaAsync<
   async _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (typeof input !== 'boolean') {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'boolean', this.message, input);
     }
 
     // Execute pipe and return result
-    return pipeResultAsync(input as TOutput, this.pipe, info, this.type);
+    return pipeResultAsync(input as TOutput, this.pipe, info, 'boolean');
   }
 }
 

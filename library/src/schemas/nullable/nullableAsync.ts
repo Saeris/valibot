@@ -22,10 +22,6 @@ export class NullableSchemaAsync<
     : Output<TWrapped> | null
 > extends BaseSchemaAsync<Input<TWrapped> | null, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'nullable';
-  /**
    * The wrapped schema.
    */
   wrapped: TWrapped;

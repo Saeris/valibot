@@ -18,10 +18,6 @@ export class NumberSchemaAsync<TOutput = number> extends BaseSchemaAsync<
   TOutput
 > {
   /**
-   * The schema type.
-   */
-  readonly type = 'number';
-  /**
    * The error message.
    */
   message: ErrorMessage;

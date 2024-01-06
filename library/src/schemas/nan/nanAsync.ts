@@ -13,10 +13,6 @@ export class NanSchemaAsync<TOutput = number> extends BaseSchemaAsync<
   TOutput
 > {
   /**
-   * The schema type.
-   */
-  readonly type = 'nan';
-  /**
    * The error message.
    */
   message: ErrorMessage;
@@ -29,7 +25,7 @@ export class NanSchemaAsync<TOutput = number> extends BaseSchemaAsync<
   async _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!Number.isNaN(input)) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'nan', this.message, input);
     }
 
     // Return parse result

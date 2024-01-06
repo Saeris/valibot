@@ -13,10 +13,6 @@ export class SymbolSchema<TOutput = symbol> extends BaseSchema<
   TOutput
 > {
   /**
-   * The schema type.
-   */
-  readonly type = 'symbol';
-  /**
    * The error message.
    */
   message: ErrorMessage;
@@ -29,7 +25,7 @@ export class SymbolSchema<TOutput = symbol> extends BaseSchema<
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (typeof input !== 'symbol') {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'symbol', this.message, input);
     }
 
     // Return parse result

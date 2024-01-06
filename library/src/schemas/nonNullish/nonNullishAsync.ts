@@ -17,10 +17,6 @@ export class NonNullishSchemaAsync<
   TOutput = NonNullish<Output<TWrapped>>
 > extends BaseSchemaAsync<NonNullish<Input<TWrapped>>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'non_nullish';
-  /**
    * The wrapped schema.
    */
   wrapped: TWrapped;
@@ -38,7 +34,7 @@ export class NonNullishSchemaAsync<
   async _parse(input: unknown, info?: ParseInfo) {
     // Allow `null` and `undefined` values not to pass
     if (input === null || input === undefined) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'non_nullish', this.message, input);
     }
 
     // Return result of wrapped schema

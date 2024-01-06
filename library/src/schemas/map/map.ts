@@ -23,10 +23,6 @@ export class MapSchema<
   TOutput = MapOutput<TKey, TValue>
 > extends BaseSchema<MapInput<TKey, TValue>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'map';
-  /**
    * The map key schema.
    */
   key: TKey;
@@ -61,7 +57,7 @@ export class MapSchema<
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!(input instanceof Map)) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'map', this.message, input);
     }
 
     // Create typed, issues and output
@@ -156,7 +152,7 @@ export class MapSchema<
 
     // If output is typed, execute pipe
     if (typed) {
-      return pipeResult(output as TOutput, this.pipe, info, this.type, issues);
+      return pipeResult(output as TOutput, this.pipe, info, 'map', issues);
     }
 
     // Otherwise, return untyped parse result

@@ -21,10 +21,6 @@ export class NullableSchema<
     : Output<TWrapped> | null
 > extends BaseSchema<Input<TWrapped> | null, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'nullable';
-  /**
    * The wrapped schema.
    */
   wrapped: TWrapped;

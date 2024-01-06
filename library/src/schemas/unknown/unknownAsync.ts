@@ -13,10 +13,6 @@ export class UnknownSchemaAsync<TOutput = unknown> extends BaseSchemaAsync<
   TOutput
 > {
   /**
-   * The schema type.
-   */
-  readonly type = 'unknown';
-  /**
    * The validation and transformation pipeline.
    */
   pipe?: PipeAsync<TOutput>;
@@ -27,7 +23,7 @@ export class UnknownSchemaAsync<TOutput = unknown> extends BaseSchemaAsync<
   }
 
   async _parse(input: unknown, info?: ParseInfo) {
-    return pipeResultAsync(input as TOutput, this.pipe, info, this.type);
+    return pipeResultAsync(input as TOutput, this.pipe, info, 'unknown');
   }
 }
 

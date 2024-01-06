@@ -22,10 +22,6 @@ export class NullishSchemaAsync<
     : Output<TWrapped> | null | undefined
 > extends BaseSchemaAsync<Input<TWrapped> | null | undefined, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'nullish';
-  /**
    * The wrapped schema.
    */
   wrapped: TWrapped;

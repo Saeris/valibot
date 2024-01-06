@@ -13,10 +13,6 @@ export class AnySchemaAsync<TOutput = any> extends BaseSchemaAsync<
   TOutput
 > {
   /**
-   * The schema type.
-   */
-  readonly type = 'any';
-  /**
    * The validation and transformation pipeline.
    */
   pipe?: PipeAsync<any>;
@@ -27,7 +23,7 @@ export class AnySchemaAsync<TOutput = any> extends BaseSchemaAsync<
   }
 
   async _parse(input: unknown, info?: ParseInfo) {
-    return pipeResultAsync(input, this.pipe, info, this.type);
+    return pipeResultAsync(input, this.pipe, info, 'any');
   }
 }
 

@@ -22,10 +22,6 @@ export class SetSchemaAsync<
   TOutput = SetOutput<TValue>
 > extends BaseSchemaAsync<SetInput<TValue>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'set';
-  /**
    * The set value schema.
    */
   value: TValue;
@@ -54,7 +50,7 @@ export class SetSchemaAsync<
   async _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!(input instanceof Set)) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'set', this.message, input);
     }
 
     // Create typed, index, output and issues
@@ -116,13 +112,7 @@ export class SetSchemaAsync<
 
     // If output is typed, execute pipe
     if (typed) {
-      return pipeResultAsync(
-        output as TOutput,
-        this.pipe,
-        info,
-        this.type,
-        issues
-      );
+      return pipeResultAsync(output as TOutput, this.pipe, info, 'set', issues);
     }
 
     // Otherwise, return untyped parse result

@@ -9,6 +9,8 @@ import {
 } from '../../types/index.ts';
 import { parseResult, schemaIssue } from '../../utils/index.ts';
 import type { ObjectSchema, ObjectSchemaAsync } from '../object/index.ts';
+import { isObjectSchema } from '../object/index.ts';
+import { VariantSchema } from './variant.ts';
 
 /**
  * Variant option async type.
@@ -17,7 +19,6 @@ export type VariantOptionAsync<TKey extends string> =
   | ObjectSchema<Record<TKey, BaseSchema>, any>
   | ObjectSchemaAsync<Record<TKey, BaseSchema | BaseSchemaAsync>, any>
   | ((BaseSchema | BaseSchemaAsync) & {
-      type: 'variant';
       options: VariantOptionsAsync<TKey>;
     });
 
@@ -38,10 +39,6 @@ export class VariantSchemaAsync<
   const TOptions extends VariantOptionsAsync<TKey>,
   TOutput = Output<TOptions[number]>
 > extends BaseSchemaAsync<Input<TOptions[number]>, TOutput> {
-  /**
-   * The schema type.
-   */
-  readonly type = 'variant';
   /**
    * The discriminator key.
    */
@@ -69,7 +66,7 @@ export class VariantSchemaAsync<
   async _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!input || typeof input !== 'object' || !(this.key in input)) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'variant', this.message, input);
     }
 
     // Create issues and output
@@ -80,7 +77,7 @@ export class VariantSchemaAsync<
     const parseOptions = async (options: VariantOptionsAsync<TKey>) => {
       for (const schema of options) {
         // If it is an object schema, parse discriminator key
-        if (schema.type === 'object') {
+        if (isObjectSchema(schema)) {
           const keyResult = await schema.entries[this.key]._parse(
             (input as Record<TKey, unknown>)[this.key],
             info
@@ -107,7 +104,7 @@ export class VariantSchemaAsync<
 
           // Otherwise, if it is a variant parse its options
           // recursively
-        } else if (schema.type === 'variant') {
+        } else if (schema instanceof (VariantSchema || VariantSchemaAsync)) {
           await parseOptions(schema.options);
 
           // If variant option was found, break loop to end execution
@@ -132,7 +129,7 @@ export class VariantSchemaAsync<
     }
 
     // If discriminator key is invalid, return issue
-    return schemaIssue(info, 'type', this.type, this.message, input);
+    return schemaIssue(info, 'type', 'variant', this.message, input);
   }
 }
 

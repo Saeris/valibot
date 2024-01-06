@@ -32,10 +32,6 @@ export class RecordSchema<
   TOutput = RecordOutput<TKey, TValue>
 > extends BaseSchema<RecordInput<TKey, TValue>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'record';
-  /**
    * The record key schema.
    */
   key: TKey;
@@ -74,7 +70,7 @@ export class RecordSchema<
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!input || typeof input !== 'object') {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'record', this.message, input);
     }
 
     // Create typed, issues and output
@@ -171,7 +167,7 @@ export class RecordSchema<
 
     // If output is typed, execute pipe
     if (typed) {
-      return pipeResult(output as TOutput, this.pipe, info, this.type, issues);
+      return pipeResult(output as TOutput, this.pipe, info, 'record', issues);
     }
 
     // Otherwise, return untyped parse result

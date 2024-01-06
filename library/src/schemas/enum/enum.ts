@@ -21,10 +21,6 @@ export class EnumSchema<
   TOutput = TEnum[keyof TEnum]
 > extends BaseSchema<TEnum[keyof TEnum], TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'enum';
-  /**
    * The enum value.
    */
   enum: TEnum;
@@ -42,7 +38,7 @@ export class EnumSchema<
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!Object.values(this.enum).includes(input as any)) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'enum', this.message, input);
     }
 
     // Return parse result

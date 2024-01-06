@@ -13,10 +13,6 @@ export class RecursiveSchema<
   TOutput = Output<ReturnType<TSchemaGetter>>
 > extends BaseSchema<Input<ReturnType<TSchemaGetter>>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'recursive';
-  /**
    * The schema getter.
    */
   getter: TSchemaGetter;

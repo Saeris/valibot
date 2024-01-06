@@ -23,10 +23,6 @@ export class ArraySchema<
   TOutput = Output<TItem>[]
 > extends BaseSchema<Input<TItem>[], TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'array';
-  /**
    * The array item schema.
    */
   item: TItem;
@@ -55,7 +51,7 @@ export class ArraySchema<
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!Array.isArray(input)) {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'array', this.message, input);
     }
 
     // Create typed, issues and output
@@ -113,7 +109,7 @@ export class ArraySchema<
         output as TOutput,
         this.pipe,
         info,
-        this.type,
+        'array',
         issues
       );
     }

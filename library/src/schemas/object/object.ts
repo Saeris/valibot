@@ -27,10 +27,6 @@ export class ObjectSchema<
   TOutput = ObjectOutput<TEntries, TRest>
 > extends BaseSchema<ObjectInput<TEntries, TRest>, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'object';
-  /**
    * The object entries schema.
    */
   entries: TEntries;
@@ -71,7 +67,7 @@ export class ObjectSchema<
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (!input || typeof input !== 'object') {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'object', this.message, input);
     }
 
     // Cache object entries lazy
@@ -178,7 +174,7 @@ export class ObjectSchema<
 
     // If output is typed, execute pipe
     if (typed) {
-      return pipeResult(output as TOutput, this.pipe, info, this.type, issues);
+      return pipeResult(output as TOutput, this.pipe, info, 'object', issues);
     }
 
     // Otherwise, return untyped parse result

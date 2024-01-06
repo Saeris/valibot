@@ -9,10 +9,6 @@ export class UnknownSchema<TOutput = unknown> extends BaseSchema<
   TOutput
 > {
   /**
-   * The schema type.
-   */
-  readonly type = 'unknown';
-  /**
    * The validation and transformation pipeline.
    */
   pipe?: Pipe<TOutput>;
@@ -23,7 +19,7 @@ export class UnknownSchema<TOutput = unknown> extends BaseSchema<
   }
 
   _parse(input: unknown, info?: ParseInfo) {
-    return pipeResult(input as TOutput, this.pipe, info, this.type);
+    return pipeResult(input as TOutput, this.pipe, info, 'unknown');
   }
 }
 

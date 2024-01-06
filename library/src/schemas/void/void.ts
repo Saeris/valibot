@@ -10,10 +10,6 @@ import { parseResult, schemaIssue } from '../../utils/index.ts';
  */
 export class VoidSchema<TOutput = void> extends BaseSchema<void, TOutput> {
   /**
-   * The schema type.
-   */
-  readonly type = 'void';
-  /**
    * The error message.
    */
   message: ErrorMessage;
@@ -26,7 +22,7 @@ export class VoidSchema<TOutput = void> extends BaseSchema<void, TOutput> {
   _parse(input: unknown, info?: ParseInfo) {
     // Check type of input
     if (typeof input !== 'undefined') {
-      return schemaIssue(info, 'type', this.type, this.message, input);
+      return schemaIssue(info, 'type', 'void', this.message, input);
     }
 
     // Return parse result
